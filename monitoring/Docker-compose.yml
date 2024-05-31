@@ -1,0 +1,25 @@
+version: '2.8'
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus/prometheus.yml:/prometheus/prometheus.yml
+      - ./prometheus/alert.rules:/prometheus/alert.rules
+    ports:
+      - "9091:9090"  # Changez cette ligne pour utiliser le port 9091
+    command:
+      - '--config.file=/prometheus/prometheus.yml'
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./grafana/grafana.ini:/grafana/grafana.ini/datasource.yml
+       - grafana-storage:/var/lib/grafana
+
+volumes:
+  grafana-storage:
+
+

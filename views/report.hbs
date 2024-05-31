@@ -1,0 +1,90 @@
+<div style="display: flex; justify-content: center; margin-left: 10%;">
+
+    <form class="form-container" method="post" action="/rapportadd">
+      <fieldset>
+
+        <h1>تقرير المعاينة الفنية </h1>
+
+        <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 flex">
+          <div class="sm:col-span-3 ml-24">
+            <label for="nom" class="block text-sm font-medium leading-6 text-gray-900">الاسم</label>
+            <div class="mt-2">
+              <input type="text" name="nom" id="nom" autocomplete="given-name"
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+          </div>
+
+          <div class="sm:col-span-3">
+            <label for="prenom" class="block text-sm font-medium leading-6 text-gray-900">اللقب</label>
+            <div class="mt-2">
+              <input type="text" name="prenom" id="prenom" autocomplete="family-name"
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 flex">
+          <div class="sm:col-span-3 ml-24">
+            <label for="cin" class="block text-sm font-medium leading-6 text-gray-900">ب.ت.و</label>
+            <div class="mt-2">
+              <input type="text" name="cin" id="cin" 
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+          </div>
+
+          <div class="sm:col-span-3">
+            <label for="sujet" class="block text-sm font-medium leading-6 text-gray-900"> الموضوع</label>
+            <div class="mt-2">
+              <input type="text" name="sujet" id="sujet" 
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+          </div>
+        </div>
+
+      </fieldset><br><br>
+      <fieldset>
+         <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 flex">
+          <div class="sm:col-span-3 ml-24">
+            <label for="surface" class="block text-sm font-medium leading-6 text-gray-900">المساحة</label>
+            <div class="mt-2">
+              <input type="text" name="surface" id="surface" 
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+          </div>
+
+          <div class="sm:col-span-3">
+            <label for="limites_terrain" class="block text-sm font-medium leading-6 text-gray-900">حدود قطعة الارض</label>
+            <div class="mt-2">
+              <input type="text" name="limites_terrain" id="limites_terrain" 
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+          </div>
+        </div>
+         <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 flex">
+          <div class="sm:col-span-3 ml-24">
+            <label for="localisation" class="block text-sm font-medium leading-6 text-gray-900">الموقع</label>
+            <div class="mt-2">
+              <input type="text" name="localisation" id="localisation" 
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+          </div>
+
+          <div class="sm:col-span-3">
+            <label for="superficie_batiments_anciens" class="block text-sm font-medium leading-6 text-gray-900">مساحة البناءات القديمة</label>
+            <div class="mt-2">
+              <input type="text" name="superficie_batiments_anciens" id="superficie_batiments_anciens" 
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+          </div>
+        </div>
+        <div class="sm:col-span-3">
+            <label for="observations" class="block text-sm font-medium leading-6 text-gray-900">الملاحظات</label>
+            <div class="mt-2">
+              <input type="text" name="observations" id="observations" 
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+        </div>
+      </fieldset><br><br>
+       <button type="submit" class="submit-btn text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">بعث</button>
+    </form>
+</div>

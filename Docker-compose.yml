@@ -1,0 +1,120 @@
+version: '3.8'
+
+services:
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "4000:4000"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=yourpassword
+      - DB_NAME=auth
+
+  ocr-service:
+    build: ./ocr-service
+    ports:
+      - "4001:4001"
+    environment:
+      - TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata
+
+  document-service:
+    build: ./document-service
+    ports:
+      - "4002:4002"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=yourpassword
+      - DB_NAME=documents
+
+  search-service:
+    build: ./search-service
+    ports:
+      - "4003:4003"
+    environment:
+      - ELASTICSEARCH_URI=http://elasticsearch:9200
+
+  collaboration-service:
+    build: ./collaboration-service
+    ports:
+      - "4004:4004"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=yourpassword
+      - DB_NAME=collaboration
+
+  report-service:
+    build: ./report-service
+    ports:
+      - "4005:4005"
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=yourpassword
+      - DB_NAME=reports
+
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "4006:4006"
+    environment:
+      - RABBITMQ_URI=amqp://rabbitmq:5672
+
+  monitoring-service:
+    build: ./monitoring-service
+    ports:
+      - "4007:4007"
+    environment:
+      - PROMETHEUS_URI=http://prometheus:9090
+
+  mysql:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=yourpassword
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+volumes:
+  mysql-data:
+  es-data:
+  rabbitmq-data:
+  grafana-data:

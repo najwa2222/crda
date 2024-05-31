@@ -1,0 +1,101 @@
+<div class="flex justify-between">
+ 
+  {{>sidebar}}
+
+  <div style="display: flex; justify-content: center; margin-left: 10%;">
+
+    <form class="form-container" method="post" action="/addservice">
+      <fieldset>
+
+        <h1>تسجيل المعطيات </h1>
+
+        <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 flex">
+          <div class="sm:col-span-3 ml-24">
+            <label for="nom" class="block text-sm font-medium leading-6 text-gray-900">الاسم</label>
+            <div class="mt-2">
+              <input type="text" name="nom" id="nom" autocomplete="given-name"
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+          </div>
+
+          <div class="sm:col-span-3">
+            <label for="prenom" class="block text-sm font-medium leading-6 text-gray-900">اللقب</label>
+            <div class="mt-2">
+              <input type="text" name="prenom" id="prenom" autocomplete="family-name"
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 flex">
+          <div class="sm:col-span-3 ml-24">
+            <label for="cin" class="block text-sm font-medium leading-6 text-gray-900">ب.ت.و</label>
+            <div class="mt-2">
+              <input type="text" name="cin" id="cin" 
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+          </div>
+
+          <div class="sm:col-span-3">
+            <label for="numero_transaction" class="block text-sm font-medium leading-6 text-gray-900">رقم المعاملة</label>
+            <div class="mt-2">
+              <input type="text" name="numero_transaction" id="numero_transaction"
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </div>
+          </div>
+        </div>
+
+      </fieldset><br><br>
+
+      <div class="row checklist">
+        <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
+          <div class="checkbox">
+            <label style="white-space: nowrap;"><input type="checkbox"  name="certificat_propriete_terre" value="true"> شهادة ملكية الارض فلاحية</label>
+          </div>
+        </div>
+        <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
+          <div class="checkbox" >
+            <label style="white-space: nowrap;"><input type="checkbox" name="copie_piece_identite_fermier" value="true">نسخة من بطاقة فلاح</label>
+          </div>
+        </div>
+      </div>
+      <div class="row checklist">
+        <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
+          <div class="checkbox" >
+            <label style="white-space: nowrap;"><input type="checkbox" name="copie_piece_identite_nationale" value="true">نسخة من بطاقة تعريف الوطنية</label>
+          </div>
+        </div>
+        <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
+          <div class="checkbox" >
+            <label style="white-space: nowrap;"><input type="checkbox" name="demande_but" value="true">مطلب للغرض</label>
+          </div>
+        </div>
+      </div>
+      <div class="row checklist">
+        <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
+          <div class="checkbox" >
+            <label style="white-space: nowrap;"><input type="checkbox" name="copie_contrat_location_terrain" value="true">نسخة من عقد كراء الاض فلاحية</label>
+          </div>
+        </div>
+        <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
+          <div class="checkbox" >
+            <label style="white-space: nowrap;"><input type="checkbox" name="autres_documents" value="true">وثائق اخري</label>
+          </div>
+        </div>
+      </div>
+
+       <div class="mt-7">
+        <div class="text-center">
+          <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">حفظ</button>
+          <button type="reset" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">مسح</button>
+        </div>
+      <div class="text-center">
+      <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">تغيير</button>
+      <button type="reset" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">حذف</button>
+        </div> 
+  
+      <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">بعث</button>
+    </form>
+
+  </div>
+</div>
