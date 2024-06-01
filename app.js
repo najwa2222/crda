@@ -6,54 +6,46 @@ const userRoutes = require('./routes/userRoutes');
 const documentRoutes = require('./routes/documentRoutes');
 const client = require('prom-client'); // Correctly importing prom-client
 
-const register = new client.Registry(); // Use client.Registry instead of client
-
+const register = new promClient.Registry();
+register.setDefaultLabels({
+  app: 'monitoring-article',
+});
 // Initialization of the Express application
 const app = express();
 
-// Add a default label which is added to all metrics
-register.setDefaultLabels({
-  app: 'APP-nodejs-app'
-});
-
-// Enable the collection of default metrics
-client.collectDefaultMetrics({ register });
-
-// Create a histogram metric
-const httpRequestDurationMicroseconds = new client.Histogram({
-  name: 'http_request_duration_seconds',
-  help: 'Duration of HTTP requests in microseconds',
+const httpRequestTimer = new promClient.Histogram({
+  name: 'http_request_duration_ms',
+  help: 'Duration of HTTP requests in ms',
   labelNames: ['method', 'route', 'code'],
-  buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10]
+  // buckets for response time from 0.1ms to 1s
+  buckets: [0.1, 5, 15, 50, 100, 200, 300, 400, 500, 1000],
 });
-
-// Register the histogram
-register.registerMetric(httpRequestDurationMicroseconds);
-
-// Define the HTTP server
-const server = require('http').createServer(async (req, res) => {
+app.get('/tweets', async (req, res) => {
+  const start = Date.now();
+  try {
+  
+  } finally {
+    const responseTimeInMs = Date.now() - start;
+    httpRequestTimer.labels(req.method, req.route.path, res.statusCode.toString()).observe(responseTimeInMs);
+  }
+});
   // Start the timer
   const end = httpRequestDurationMicroseconds.startTimer();
 
   // Retrieve route from request object
-  const route = require('url').parse(req.url).pathname;
-
-  if (route === '/metrics') {
-    // Return all metrics in the Prometheus exposition format
+  app.get('/metrics', async (req, res) => {
     res.setHeader('Content-Type', register.contentType);
-    res.end(await register.metrics());
-  }
-
+    res.send(await register.metrics());
+  });
   // End timer and add labels
   end({ route, code: res.statusCode, method: req.method });
-});
 
-// Start the HTTP server which exposes the metrics on http://localhost:9092/metrics
-server.listen(9092);
+
+
 
 // Middleware to parse the request body in JSON and URL-encoded formats
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
 
 // Configure database connection information
 const connection = mysql.createConnection({
