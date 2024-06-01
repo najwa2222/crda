@@ -1,0 +1,137 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/najwa2222/crda/api-gateway.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    dockerImage = docker.build("najwakarrouchi968/api-gateway:latest")
+                }
+            }
+        }
+        stage('Build and Test Microservices') {
+            parallel {
+                stage('Build and Test Authentification') {
+                    steps {
+                        dir('authentification') {
+                            script {
+                                dockerImage = docker.build("najwakarrouchi968/authentification:latest")
+                            }
+                            script {
+                                dockerImage.inside {
+                                    sh 'npm install'
+                                    sh 'npm test'
+                                }
+                            }
+                        }
+                    }
+                }    
+            }  
+
+
+            }    
+                stage('Build and Test Gestion Documents Service') {
+                    steps {
+                        dir('gestiondocuments') {
+                            script {
+                                dockerImage = docker.build("najwakarrouchi968/gestiondocuments:latest")
+                            }
+                            script {
+                                dockerImage.inside {
+                                    sh 'npm install'
+                                    sh 'npm test'
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Build and Test enregistrement Service') {
+                    steps {
+                        dir('enregistrement') {
+                            script {
+                                dockerImage = docker.build("najwakarrouchi968/enregistrement:latest")
+                            }
+                            script {
+                                dockerImage.inside {
+                                    sh 'npm install'
+                                    sh 'npm test'
+                                }
+                            }
+                        }
+                    }
+                }
+                stage('Build and Test controllers Service') {
+                    steps {
+                        dir('controllers') {
+                            script {
+                                dockerImage = docker.build("najwakarrouchi968/controllers:latest")
+                            }
+                            script {
+                                dockerImage.inside {
+                                    sh 'npm install'
+                                    sh 'npm test'
+                                }
+                            }
+                        }
+                    }
+                }
+            
+        
+
+ stage('Build and Test notification Service') {
+                    steps {
+                        dir('notification') {
+                            script {
+                                dockerImage = docker.build("najwakarrouchi968/notification:latest")
+                            }
+                            script {
+                                dockerImage.inside {
+                                    sh 'npm install'
+                                    sh 'npm test'
+                                }
+                            }
+                        }
+                    }
+                }
+            
+        
+
+      
+        stage('Push Microservices Images') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+                        docker.image('najwakarrouchi968/authentification:latest').push()
+                        docker.image('najwakarrouchi968/gestiondocuments:latest').push()
+                        docker.image('najwakarrouchi968/enregistrement:latest').push()
+                        docker.image('najwakarrouchi968/controllers:latest').push()
+                        docker.image('najwakarrouchi968/notification:latest').push()
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Microservices') {
+            steps {
+                script {
+                   sh 'kubectl apply -f kubernetes/deployment-api-gateway.yaml'
+                   sh 'kubectl apply -f path/to/kubernetes/deployment-authentification.yaml'
+                   sh 'kubectl apply -f path/to/kubernetes/deployment-gestiondocuments.yaml'
+                   sh 'kubectl apply -f path/to/kubernetes/deployment-enregistrement.yaml'
+                   sh 'kubectl apply -f path/to/kubernetes/deployment-controllers.yaml'
+                   sh 'kubectl apply -f path/to/kubernetes/deployment-notification.yaml'
+                }
+            }
+     
+        }
+
+    }
+}       
+    
+
