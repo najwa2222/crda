@@ -6,12 +6,22 @@ pipeline {
         PATH = "${env.NODEJS_HOME}/bin:${env.PATH}"
         CHROME_BIN = '/usr/bin/google-chrome'
         DOCKER_HUB_REGISTRY = 'docker.io'
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')  // Assurez-vous que l'ID des identifiants est correct
+       
     }
 
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                script {
+                    def repoUrl = 'https://github.com/najwa2222/crda/api-gateway.git'
+                    try {
+                        echo "Clonage du dépôt depuis ${repoUrl}"
+                        git url: repoUrl, credentialsId: 'git-credentials-id'  // Utilise les identifiants Git
+                    } catch (e) {
+                        error "Échec du clonage du dépôt : ${repoUrl}"
+                    }
+                }
             }
         }
 
@@ -33,12 +43,13 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    withSonarQubeEnv('SonarQube Test') {
+                    withSonarQubeEnv('SonarQube Test') {  // Assurez-vous que le nom correspond à votre configuration SonarQube
                         bat 'npm run sonarqube'
                     }
                 }
             }
         }
+
         stage('Build API Gateway') {
             steps {
                 script {
