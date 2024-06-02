@@ -2,29 +2,43 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-        
+        NODEJS_HOME = tool name: 'NodeJS', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
+        PATH = "${env.NODEJS_HOME}/bin:${env.PATH}"
+        CHROME_BIN = '/usr/bin/google-chrome'
+        DOCKER_HUB_REGISTRY = 'docker.io'
     }
 
     stages {
         stage('Checkout') {
             steps {
-<<<<<<< HEAD
-                script {
-                    def repoUrl = 'https://github.com/najwa2222/crda/api-gateway.git'
-                    try {
-                        echo "Clonage du dépôt depuis ${repoUrl}"
-                        git url: repoUrl
-                    } catch (e) {
-                        error "Échec du clonage du dépôt : ${repoUrl}"
-                    }
-                }
-=======
-                git 'https://github.com/najwa2222/crda.git'
->>>>>>> 24acdbdee4edc722060153db5ac0c09878376ef1
+                checkout scm
             }
         }
 
+        stage('Install dependencies') {
+            steps {
+                script {
+                    bat 'npm install'
+                    bat 'npm install node-pre-gyp'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat 'npm run build'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv('SonarQube Test') {
+                        bat 'npm run sonarqube'
+                    }
+                }
+            }
+        }
         stage('Build API Gateway') {
             steps {
                 script {
