@@ -9,6 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+<<<<<<< HEAD
                 script {
                     def repoUrl = 'https://github.com/najwa2222/crda/api-gateway.git'
                     try {
@@ -18,6 +19,9 @@ pipeline {
                         error "Échec du clonage du dépôt : ${repoUrl}"
                     }
                 }
+=======
+                git 'https://github.com/najwa2222/crda.git'
+>>>>>>> 24acdbdee4edc722060153db5ac0c09878376ef1
             }
         }
 
