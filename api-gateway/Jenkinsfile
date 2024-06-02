@@ -7,7 +7,7 @@ pipeline {
         CHROME_BIN = '/usr/bin/google-chrome'
         DOCKER_HUB_REGISTRY = 'docker.io'
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')  // Assurez-vous que l'ID des identifiants est correct
-       
+        KUBECONFIG_CREDENTIALS = credentials('kubeconfig-credentials')
     }
 
     stages {
