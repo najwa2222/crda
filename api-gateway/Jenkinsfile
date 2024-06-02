@@ -14,7 +14,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    def repoUrl = 'https://github.com/najwa2222/crda/api-gateway.git'
+                    def repoUrl = 'https://github.com/najwa2222/crda.git'
                     try {
                         echo "Clonage du dépôt depuis ${repoUrl}"
                         git url: repoUrl, credentialsId: 'git-credentials-id'  // Utilise les identifiants Git
