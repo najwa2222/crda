@@ -10,7 +10,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    def repoUrl = 'https://github.com/najwa2222/crda/api-gateway.git'
+                    def repoUrl = 'https://github.com/najwa2222/crda/authentification.git'
                     try {
                         echo "Clonage du dépôt depuis ${repoUrl}"
                         git url: repoUrl
@@ -21,26 +21,41 @@ pipeline {
             }
         }
 
-        stage('Build API Gateway') {
+        stage('Build Authentification Service') {
             steps {
                 script {
                     try {
-                        echo "Construction de l'image Docker pour API Gateway"
-                        dockerImage = docker.build("najwakarrouchi968/api-gateway:latest")
+                        echo "Construction de l'image Docker pour le service Authentification"
+                        dockerImage = docker.build("najwakarrouchi968/authentification:latest")
                     } catch (e) {
-                        error "Échec de la construction de l'image Docker pour API Gateway"
+                        error "Échec de la construction de l'image Docker pour le service Authentification"
                     }
                 }
             }
         }
 
-        stage('Push API Gateway Image') {
+        stage('Test Authentification Service') {
+            steps {
+                script {
+                    dockerImage.inside {
+                        try {
+                            sh 'npm install'
+                            sh 'npm test'
+                        } catch (e) {
+                            error "Échec des tests pour le service Authentification"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Push Authentification Image') {
             steps {
                 script {
                     try {
                         echo "Poussée de l'image Docker vers DockerHub"
                         docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
-                            docker.image('najwakarrouchi968/api-gateway:latest').push()
+                            docker.image('najwakarrouchi968/authentification:latest').push()
                         }
                     } catch (e) {
                         error "Échec de la poussée de l'image Docker vers DockerHub"
@@ -49,15 +64,15 @@ pipeline {
             }
         }
 
-        stage('Deploy API Gateway') {
+        stage('Deploy Authentification Service') {
             steps {
                 script {
                     withCredentials([file(credentialsId: 'kubeconfig-credentials', variable: 'KUBECONFIG')]) {
                         try {
-                            echo "Déploiement de l'API Gateway sur Kubernetes"
-                            sh 'kubectl apply -f kubernetes/deployment-api-gateway.yaml'
+                            echo "Déploiement du service Authentification sur Kubernetes"
+                            sh 'kubectl apply -f kubernetes/deployment-authentification.yaml'
                         } catch (e) {
-                            error "Échec du déploiement de l'API Gateway sur Kubernetes"
+                            error "Échec du déploiement du service Authentification sur Kubernetes"
                         }
                     }
                 }
