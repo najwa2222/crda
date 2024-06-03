@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build":"RUN npm install",
+    "sonarqube": "npm run sonarqube"
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
