@@ -4,53 +4,47 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                // Use bat instead of sh for Windows
-                bat 'npm install'
-                bat 'npm test'
-                bat 'npm run lint'
-                bat 'docker build -t najwakarrouchi/authentification:latest .'
+                powershell 'npm install'
+                powershell 'npm test'
+                powershell 'npm run lint'
+                powershell 'docker build -t najwakarrouchi/authentification:latest .'
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                // Use bat instead of sh for Windows
-                bat 'docker login -u najwakarrouchi -p %DOCKER_PASSWORD% docker.io'
-                bat 'docker push najwakarrouchi/authentification:latest'
+                powershell 'docker login -u najwakarrouchi -p ${env.DOCKER_PASSWORD} docker.io'
+                powershell 'docker push najwakarrouchi/authentification:latest'
             }
         }
 
         stage('Deploy to Development') {
             steps {
-                // Use bat instead of sh for Windows
-                bat 'docker run -d -p 3000:3000 najwakarrouchi/authentification:latest'
-                bat 'curl -X GET http://localhost:3000/health'
+                powershell 'docker run -d -p 3000:3000 najwakarrouchi/authentification:latest'
+                powershell 'curl -X GET http://localhost:3000/health'
             }
         }
 
         stage('Deploy to Staging') {
             steps {
-                // Use bat instead of sh for Windows
-                bat 'docker run -d -p 3001:3000 najwakarrouchi/authentification:latest'
-                bat 'curl -X GET http://localhost:3001/health'
+                powershell 'docker run -d -p 3001:3000 najwakarrouchi/authentification:latest'
+                powershell 'curl -X GET http://localhost:3001/health'
             }
         }
 
         stage('Deploy to Production') {
             steps {
-                // Use bat instead of sh for Windows
-                bat 'docker run -d -p 80:3000 najwakarrouchi/authentification:latest'
-                bat 'curl -X GET http://localhost:80/health'
+                powershell 'docker run -d -p 80:3000 najwakarrouchi/authentification:latest'
+                powershell 'curl -X GET http://localhost:80/health'
             }
         }
     }
 
     post {
         always {
-            // Use bat instead of sh for Windows
             junit 'reports/**/*.xml'
             archiveArtifacts 'coverage/**/*.html'
-            bat 'docker logout docker.io'
+            powershell 'docker logout docker.io'
         }
     }
 }
