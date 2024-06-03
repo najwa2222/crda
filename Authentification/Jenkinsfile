@@ -4,47 +4,53 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'npm install'
-                sh 'npm test'
-                sh 'npm run lint'
-                sh 'docker build -t najwakarrouchi/authentification:latest .'
+                // Use bat instead of sh for Windows
+                bat 'npm install'
+                bat 'npm test'
+                bat 'npm run lint'
+                bat 'docker build -t najwakarrouchi/authentification:latest .'
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                sh 'docker login -u najwakarrouchi -p ${DOCKER_PASSWORD} docker.io'
-                sh 'docker push najwakarrouchi/authentification:latest'
+                // Use bat instead of sh for Windows
+                bat 'docker login -u najwakarrouchi -p %DOCKER_PASSWORD% docker.io'
+                bat 'docker push najwakarrouchi/authentification:latest'
             }
         }
 
         stage('Deploy to Development') {
             steps {
-                sh 'docker run -p 3000:3000 najwakarrouchi/authentification:latest'
-                sh 'curl -X GET http://localhost:3000/health'
+                // Use bat instead of sh for Windows
+                bat 'docker run -d -p 3000:3000 najwakarrouchi/authentification:latest'
+                bat 'curl -X GET http://localhost:3000/health'
             }
         }
 
         stage('Deploy to Staging') {
             steps {
-                sh 'docker run -p 3001:3000 najwakarrouchi/authentification:latest'
-                sh 'curl -X GET http://localhost:3001/health'
+                // Use bat instead of sh for Windows
+                bat 'docker run -d -p 3001:3000 najwakarrouchi/authentification:latest'
+                bat 'curl -X GET http://localhost:3001/health'
             }
         }
 
         stage('Deploy to Production') {
             steps {
-                sh 'docker run -p 80:3000 najwakarrouchi/authentification:latest'
-                sh 'curl -X GET http://localhost:80/health'
+                // Use bat instead of sh for Windows
+                bat 'docker run -d -p 80:3000 najwakarrouchi/authentification:latest'
+                bat 'curl -X GET http://localhost:80/health'
             }
         }
     }
 
     post {
         always {
+            // Use bat instead of sh for Windows
             junit 'reports/**/*.xml'
             archiveArtifacts 'coverage/**/*.html'
-            sh 'docker logout docker.io'
+            bat 'docker logout docker.io'
         }
     }
 }
