@@ -1,4 +1,4 @@
-pipeline {
+   pipeline {
     agent any
 
     environment {
@@ -27,7 +27,9 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'RUN npm install'
+                script {
+                    bat 'npm install'
+                }
             }
         }
 
