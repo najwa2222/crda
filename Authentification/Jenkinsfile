@@ -1,100 +1,50 @@
 pipeline {
     agent any
 
-    environment {
-        NODEJS_HOME = tool name: 'NodeJS 20.11.0', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
-        PATH = "${env.NODEJS_HOME}/bin:${env.PATH}"
-        DOCKER_HUB_REGISTRY = 'docker.io'
-        DOCKER_CREDENTIALS_ID = 'dockerhub_credentials' // ID des credentials Docker Hub dans Jenkins
-        DOCKER_IMAGE = 'najwakarrouchi968/authentification'
-        KUBECONFIG_CREDENTIALS_ID = 'kubeconfig_credentials' // ID des credentials Kubeconfig dans Jenkins
-        SONARQUBE_ENV = 'SonarQube Test' // Nom de votre configuration SonarQube dans Jenkins
-        MSBUILD_SONARQUBE_SCANNER_HOME = tool name: 'SonarQube Test', type: 'hudson.plugins.sonar.MsBuildSQScannerInstallation'
-    }
-
     stages {
-        stage('Checkout') {
-            steps {
-                // Récupérer le code source
-                git url: 'https://github.com/najwa2222/crda.git', branch: 'master'
-            }
-        }
-
-        stage('Install dependencies') {
-            steps {
-                // Installer les dépendances
-                sh 'npm install'
-                sh 'npm install node-pre-gyp'
-            }
-        }
-
         stage('Build') {
             steps {
-                // Construire le projet
                 sh 'npm install'
+                sh 'npm test'
+                sh 'npm run lint'
+                sh 'docker build -t najwakarrouchi/authentification:latest .'
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Push to Docker Hub') {
             steps {
-                script {
-                    withSonarQubeEnv('SonarQube Test') {
-                        // Préparer l'analyse SonarQube
-                        bat "\"${MSBUILD_SONARQUBE_SCANNER_HOME}/SonarScanner.MSBuild.exe\" begin /k:\"my_project_key\" /d:sonar.host.url=\"${SONAR_HOST_URL}\" /d:sonar.login=\"${SONAR_AUTH_TOKEN}\""
-                        
-                        // Construire le projet avec MSBuild
-                        bat "MSBuild.exe /t:Rebuild"
-
-                        // Terminer l'analyse SonarQube
-                        bat "\"${MSBUILD_SONARQUBE_SCANNER_HOME}/SonarScanner.MSBuild.exe\" end /d:sonar.login=\"${SONAR_AUTH_TOKEN}\""
-                    }
-                }
+                sh 'docker login -u najwakarrouchi -p ${DOCKER_PASSWORD} docker.io'
+                sh 'docker push najwakarrouchi/authentification:latest'
             }
         }
 
-        stage('Build Docker image') {
+        stage('Deploy to Development') {
             steps {
-                script {
-                    // Construire l'image Docker
-                    def app = docker.build("${env.DOCKER_IMAGE}:latest")
-                }
+                sh 'docker run -p 3000:3000 najwakarrouchi/authentification:latest'
+                sh 'curl -X GET http://localhost:3000/health'
             }
         }
 
-        stage('Push Docker image') {
+        stage('Deploy to Staging') {
             steps {
-                script {
-                    docker.withRegistry('', "${env.DOCKER_CREDENTIALS_ID}") {
-                        // Pousser l'image Docker sur Docker Hub
-                        def app = docker.image("${env.DOCKER_IMAGE}:latest")
-                        app.push()
-                    }
-                }
+                sh 'docker run -p 3001:3000 najwakarrouchi/authentification:latest'
+                sh 'curl -X GET http://localhost:3001/health'
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Deploy to Production') {
             steps {
-                withCredentials([file(credentialsId: "${env.KUBECONFIG_CREDENTIALS_ID}", variable: 'KUBECONFIG')]) {
-                    // Déployer sur Kubernetes
-                    sh 'kubectl set image deployment/authentification authentification=${DOCKER_IMAGE}:latest --kubeconfig=$KUBECONFIG'
-                    sh 'kubectl rollout status deployment/authentification --kubeconfig=$KUBECONFIG'
-                }
+                sh 'docker run -p 80:3000 najwakarrouchi/authentification:latest'
+                sh 'curl -X GET http://localhost:80/health'
             }
         }
     }
 
     post {
         always {
-            // Archiver les rapports de test, les journaux, etc.
-            junit '**/test-results.xml'
-            archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
-        }
-        success {
-            echo 'Pipeline réussi!'
-        }
-        failure {
-            echo 'Pipeline échoué!'
+            junit 'reports/**/*.xml'
+            archiveArtifacts 'coverage/**/*.html'
+            sh 'docker logout docker.io'
         }
     }
 }
