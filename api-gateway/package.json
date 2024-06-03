@@ -4,6 +4,8 @@
   "description": "API Gateway using Express.js",
   "main": "index.js",
   "scripts": {
+    "test": "jest",
+    "sonarqube": " npm run sonarqube",
     "start": "node index.js"
   },
   "dependencies": {
