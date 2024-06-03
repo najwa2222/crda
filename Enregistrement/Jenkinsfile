@@ -2,81 +2,72 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-       
+        NODEJS_HOME = tool name: 'NodeJS', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
+        PATH = "${env.NODEJS_HOME}/bin:${env.PATH}"
+        CHROME_BIN = '/usr/bin/google-chrome'
+        DOCKER_HUB_REGISTRY = 'docker.io'
     }
 
     stages {
         stage('Checkout') {
             steps {
+                checkout scm
+            }
+        }
+
+        stage('Install dependencies') {
+            steps {
                 script {
-                    def repoUrl = 'https://github.com/najwa2222/crda/enregistrement.git'
-                    try {
-                        echo "Clonage du dépôt depuis ${repoUrl}"
-                        git url: repoUrl
-                    } catch (e) {
-                        error "Échec du clonage du dépôt : ${repoUrl}"
+                    bat 'npm install'
+                    bat 'npm install node-pre-gyp'
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat 'npm run build'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv('SonarQube Test') {
+                        bat 'npm run sonarqube'
                     }
                 }
             }
         }
 
-        stage('Build Enregistrement Service') {
+        stage('Build Docker image') {
             steps {
                 script {
-                    try {
-                        echo "Construction de l'image Docker pour le service Enregistrement"
-                        dockerImage = docker.build("najwakarrouchi968/enregistrement:latest")
-                    } catch (e) {
-                        error "Échec de la construction de l'image Docker pour le service Enregistrement"
-                    }
+                    bat 'docker build --no-cache -t user:latest -f Dockerfile .'
+                    bat 'docker tag user:latest najwakarrouchi968/user:latest'
                 }
             }
         }
 
-        stage('Test Enregistrement Service') {
+        stage('Deploy Docker image') {
             steps {
                 script {
-                    dockerImage.inside {
-                        try {
-                            sh 'npm install'
-                            sh 'npm test'
-                        } catch (e) {
-                            error "Échec des tests pour le service Enregistrement"
-                        }
+                    withCredentials([string(credentialsId: 'docker-hub-token', variable: 'DOCKER_TOKEN')]) {
+                        bat "echo $DOCKER_TOKEN | docker login --username najwakarrouchi968 --password-stdin"
+                        bat "docker push najwakarrouchi968/user:latest"
                     }
                 }
             }
         }
+    }
 
-        stage('Push Enregistrement Image') {
-            steps {
-                script {
-                    try {
-                        echo "Poussée de l'image Docker vers DockerHub"
-                        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
-                            docker.image('najwakarrouchi968/enregistrement:latest').push()
-                        }
-                    } catch (e) {
-                        error "Échec de la poussée de l'image Docker vers DockerHub"
-                    }
-                }
-            }
+    post {
+        success {
+            echo 'Build succeeded!'
         }
 
-        stage('Deploy Enregistrement Service') {
-            steps {
-                script {
-                    withCredentials([file(credentialsId: 'kubeconfig-credentials', variable: 'KUBECONFIG')]) {
-                        try {
-                            echo "Déploiement du service Enregistrement sur Kubernetes"
-                            sh 'kubectl apply -f kubernetes/deployment-enregistrement.yaml'
-                        } catch (e) {
-                            error "Échec du déploiement du service Enregistrement sur Kubernetes"
-                        }
-                    }
-                }
-            }
+        failure {
+            echo 'Build failed!'
         }
     }
 }

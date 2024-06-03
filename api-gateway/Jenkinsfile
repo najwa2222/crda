@@ -6,22 +6,12 @@ pipeline {
         PATH = "${env.NODEJS_HOME}/bin:${env.PATH}"
         CHROME_BIN = '/usr/bin/google-chrome'
         DOCKER_HUB_REGISTRY = 'docker.io'
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')  // Assurez-vous que l'ID des identifiants est correct
-        KUBECONFIG_CREDENTIALS = credentials('kubeconfig-credentials')
     }
 
     stages {
         stage('Checkout') {
             steps {
-                script {
-                    def repoUrl = 'https://github.com/najwa2222/crda.git'
-                    try {
-                        echo "Clonage du dépôt depuis ${repoUrl}"
-                        git url: repoUrl, credentialsId: 'git-credentials-id'  // Utilise les identifiants Git
-                    } catch (e) {
-                        error "Échec du clonage du dépôt : ${repoUrl}"
-                    }
-                }
+                checkout scm
             }
         }
 
@@ -43,54 +33,41 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    withSonarQubeEnv('SonarQube Test') {  // Assurez-vous que le nom correspond à votre configuration SonarQube
+                    withSonarQubeEnv('SonarQube Test') {
                         bat 'npm run sonarqube'
                     }
                 }
             }
         }
 
-        stage('Build API Gateway') {
+        stage('Build Docker image') {
             steps {
                 script {
-                    try {
-                        echo "Construction de l'image Docker pour API Gateway"
-                        dockerImage = docker.build("najwakarrouchi968/api-gateway:latest")
-                    } catch (e) {
-                        error "Échec de la construction de l'image Docker pour API Gateway"
-                    }
+                    bat 'docker build --no-cache -t user:latest -f Dockerfile .'
+                    bat 'docker tag user:latest najwakarrouchi968/user:latest'
                 }
             }
         }
 
-        stage('Push API Gateway Image') {
+        stage('Deploy Docker image') {
             steps {
                 script {
-                    try {
-                        echo "Poussée de l'image Docker vers DockerHub"
-                        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
-                            docker.image('najwakarrouchi968/api-gateway:latest').push()
-                        }
-                    } catch (e) {
-                        error "Échec de la poussée de l'image Docker vers DockerHub"
+                    withCredentials([string(credentialsId: 'docker-hub-token', variable: 'DOCKER_TOKEN')]) {
+                        bat "echo $DOCKER_TOKEN | docker login --username najwakarrouchi968 --password-stdin"
+                        bat "docker push najwakarrouchi968/user:latest"
                     }
                 }
             }
         }
+    }
 
-        stage('Deploy API Gateway') {
-            steps {
-                script {
-                    withCredentials([file(credentialsId: 'kubeconfig-credentials', variable: 'KUBECONFIG')]) {
-                        try {
-                            echo "Déploiement de l'API Gateway sur Kubernetes"
-                            sh 'kubectl apply -f kubernetes/deployment-api-gateway.yaml'
-                        } catch (e) {
-                            error "Échec du déploiement de l'API Gateway sur Kubernetes"
-                        }
-                    }
-                }
-            }
+    post {
+        success {
+            echo 'Build succeeded!'
+        }
+
+        failure {
+            echo 'Build failed!'
         }
     }
 }
