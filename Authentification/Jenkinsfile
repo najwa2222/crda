@@ -5,7 +5,7 @@ pipeline {
         stage('Build') {
             steps {
                 powershell 'npm install'
-                powershell 'npm test'
+                powershell 'npx jest'
                 powershell 'npm run lint'
                 powershell 'docker build -t najwakarrouchi/authentification:latest .'
             }
