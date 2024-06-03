@@ -8,12 +8,13 @@ pipeline {
         DOCKER_HUB_REGISTRY = 'docker.io'
     }
 
-    stage('Checkout') {
-    steps {
-        // Replace <repository_url> with your actual repository URL
-        git 'https://github.com/najwa2222/crda.git'
-    }
-}
+    stages {
+        stage('Checkout') {
+            steps {
+                // Replace <repository_url> with your actual repository URL
+                git 'https://github.com/najwa2222/crda.git'
+            }
+        }
 
         stage('Install dependencies') {
             steps {
