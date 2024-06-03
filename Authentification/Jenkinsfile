@@ -1,76 +1,77 @@
-   pipeline {
+pipeline {
     agent any
 
     environment {
-        NODEJS_HOME = tool name: 'NodeJS', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
-        PATH = "${env.NODEJS_HOME}/bin:${env.PATH}"
-        CHROME_BIN = '/usr/bin/google-chrome'
-        DOCKER_HUB_REGISTRY = 'docker.io'
+        DOCKER_CREDENTIALS_ID = 'dockerhub_credentials' // ID des credentials Docker Hub dans Jenkins
+        DOCKER_IMAGE = 'najwakarrouchi968/authentification'
+        KUBECONFIG_CREDENTIALS_ID = 'kubeconfig_credentials' // ID des credentials Kubeconfig dans Jenkins
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Replace <repository_url> with your actual repository URL
-                git 'https://github.com/najwa2222/crda.git'
+                // Récupérer le code source
+                checkout scm
             }
         }
-
-        stage('Install dependencies') {
+        
+        stage('Install Dependencies') {
+            steps {
+                // Installer les dépendances
+                sh 'npm install'
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                // Exécuter les tests
+                sh 'npm test'
+            }
+        }
+        
+        stage('Build Docker Image') {
             steps {
                 script {
-                    bat 'npm install'
-                    bat 'npm install node-pre-gyp'
+                    // Construire l'image Docker
+                    def app = docker.build("${env.DOCKER_IMAGE}:latest")
                 }
             }
         }
-
-        stage('Build') {
+        
+        stage('Push Docker Image') {
             steps {
                 script {
-                    bat 'npm install'
-                }
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                    withSonarQubeEnv('SonarQube Test') {
-                        bat 'npm run sonarqube'
+                    docker.withRegistry('', "${env.DOCKER_CREDENTIALS_ID}") {
+                        // Pousser l'image Docker sur Docker Hub
+                        def app = docker.image("${env.DOCKER_IMAGE}:latest")
+                        app.push()
                     }
                 }
             }
         }
-
-        stage('Build Docker image') {
+        
+        stage('Deploy to Kubernetes') {
             steps {
-                script {
-                    bat 'docker build --no-cache -t user:latest -f Dockerfile .'
-                    bat 'docker tag user:latest najwakarrouchi968/user:latest'
-                }
-            }
-        }
-
-        stage('Deploy Docker image') {
-            steps {
-                script {
-                    withCredentials([string(credentialsId: 'docker-hub-token', variable: 'DOCKER_TOKEN')]) {
-                        bat "echo $DOCKER_TOKEN | docker login --username najwakarrouchi968 --password-stdin"
-                        bat "docker push najwakarrouchi968/user:latest"
-                    }
+                withCredentials([file(credentialsId: "${env.KUBECONFIG_CREDENTIALS_ID}", variable: 'KUBECONFIG')]) {
+                    // Déployer sur Kubernetes
+                    sh 'kubectl set image deployment/authentification authentification=${DOCKER_IMAGE}:latest --kubeconfig=$KUBECONFIG'
+                    sh 'kubectl rollout status deployment/authentification --kubeconfig=$KUBECONFIG'
                 }
             }
         }
     }
 
     post {
-        success {
-            echo 'Build succeeded!'
+        always {
+            // Archiver les rapports de test, les journaux, etc.
+            junit '**/test-results.xml'
+            archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
         }
-
+        success {
+            echo 'Pipeline réussi!'
+        }
         failure {
-            echo 'Build failed!'
+            echo 'Pipeline échoué!'
         }
     }
 }
