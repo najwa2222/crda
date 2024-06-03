@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run build",
+    "test": "jest",
+    "sonarqube": " npm run sonarqube",
     "start": "nodemon app.js",
     "css": "npx tailwindcss -i ./src/input.css -o ./public/css/style.css"
   },
