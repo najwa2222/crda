@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Récupérer le code source
-                checkout scm
+                 git url: 'https://github.com/najwa2222/crda', branch: 'master'
             }
         }
         
