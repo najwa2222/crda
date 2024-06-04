@@ -27,7 +27,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat '"webpack --config webpack.config.js"'
+                bat 'npm install'
             }
         }
 
