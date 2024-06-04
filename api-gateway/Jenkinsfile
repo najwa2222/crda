@@ -27,7 +27,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'RUN npm install'
+                bat 'npm run build'
             }
         }
 
