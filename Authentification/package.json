@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build":"RUN npm install",
-    "sonarqube": "npm run sonarqube"
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npm install && npm run test",
+    "test":"jest"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
 }
