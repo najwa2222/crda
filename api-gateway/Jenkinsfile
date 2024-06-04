@@ -19,8 +19,8 @@ pipeline {
         stage('Install dependencies') {
             steps {
                 script {
-                    bat 'npm install'
-                    bat 'npm install node-pre-gyp'
+                    bat 'npm install --force'
+                    bat 'npm install node-pre-gyp --force'
                 }
             }
         }
@@ -34,7 +34,7 @@ pipeline {
         stage('Build Docker image') {
             steps {
                 script {
-                    bat 'docker build --no-cache -t user:latest -f Dockerfile .'
+                    bat 'docker build --no-cache -t user:latest -f Dockerfile.'
                     bat 'docker tag user:latest najwakarrouchi968/user:latest'
                 }
             }
