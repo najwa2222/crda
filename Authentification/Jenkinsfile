@@ -4,47 +4,21 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                powershell 'npm install'
-                powershell 'npx jest'
-                powershell 'npm run lint'
-                powershell 'docker build -t najwakarrouchi/authentification:latest .'
+                script {
+                    git 'https://github.com/najwa2222/crda.git'
+                    docker.build("najwakarrouchi968/crda")
+                }
             }
         }
 
-        stage('Push to Docker Hub') {
+        stage('Push to DockerHub') {
             steps {
-                powershell 'docker login -u najwakarrouchi -p ${env.DOCKER_PASSWORD} docker.io'
-                powershell 'docker push najwakarrouchi/authentification:latest'
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
+                        docker.image("najwakarrouchi968/crda").push("latest")
+                    }
+                }
             }
-        }
-
-        stage('Deploy to Development') {
-            steps {
-                powershell 'docker run -d -p 3000:3000 najwakarrouchi/authentification:latest'
-                powershell 'curl -X GET http://localhost:3000/health'
-            }
-        }
-
-        stage('Deploy to Staging') {
-            steps {
-                powershell 'docker run -d -p 3001:3000 najwakarrouchi/authentification:latest'
-                powershell 'curl -X GET http://localhost:3001/health'
-            }
-        }
-
-        stage('Deploy to Production') {
-            steps {
-                powershell 'docker run -d -p 80:3000 najwakarrouchi/authentification:latest'
-                powershell 'curl -X GET http://localhost:80/health'
-            }
-        }
-    }
-
-    post {
-        always {
-            junit 'reports/**/*.xml'
-            archiveArtifacts 'coverage/**/*.html'
-            powershell 'docker logout docker.io'
         }
     }
 }
