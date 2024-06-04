@@ -1,45 +1,62 @@
 pipeline {
     agent any
-
-    environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
-        DOCKERHUB_REPO = 'najwakarrouchi968/crda'
-    }
-
+    
     stages {
-        stage('Checkout') {
+        stage('Préparation') {
             steps {
-                script {
-                    git 'https://github.com/najwa2222/crda.git'
-                }
+                // Checkout du code depuis le dépôt Git
+                git 'https://github.com/najwa2222/crda.git'
+                
+                // Installation des dépendances Node.js ou autre langue/framework
+                sh 'npm install'
             }
         }
-
-        stage('Build Docker Image') {
+        
+        stage('Tests') {
             steps {
-                script {
-                    docker.build("${env.DOCKERHUB_REPO}")
-                }
+                // Exécution des tests unitaires et d'intégration
+                sh 'npm test'
             }
         }
-
-        stage('Push to DockerHub') {
+        
+        stage('Construction') {
             steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', "${env.DOCKERHUB_CREDENTIALS}") {
-                        docker.image("${env.DOCKERHUB_REPO}").push("latest")
-                    }
+                // Construction de l'application
+                sh 'npm run build'
+            }
+        }
+        
+        stage('Construction de l\'image Docker') {
+            steps {
+                // Construction de l'image Docker
+                sh 'docker build -t najwakarrouchi968/authentification:latest .'
+            }
+        }
+        
+        stage('Pousser vers Docker Hub') {
+            steps {
+                // Authentification avec Docker Hub
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                 }
+                
+                // Poussement de l'image vers Docker Hub
+                sh 'docker push najwakarrouchi968/authentification:latest'
             }
         }
     }
-
+    
     post {
+        // Envoi d'une notification par e-mail en cas de succès ou d'échec du pipeline
         success {
-            echo 'Pipeline succeeded!'
+            emailext subject: 'Pipeline réussi',
+                      body: 'Le pipeline d\'authentification a été exécuté avec succès.',
+                      to: 'najwakarrouchi@gmail.com'
         }
         failure {
-            echo 'Pipeline failed!'
+            emailext subject: 'Échec du pipeline',
+                      body: 'Le pipeline d\'authentification a échoué. Veuillez vérifier les logs pour plus de détails.',
+                      to: 'najwakarrouchi@gmail.com'
         }
     }
 }
