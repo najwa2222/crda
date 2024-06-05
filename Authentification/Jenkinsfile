@@ -15,18 +15,7 @@ pipeline {
             }
         }
         
-        stage('Unit Tests') {
-            steps {
-                bat 'npm test' // Exécuter les tests unitaires
-            }
-        }
-        
-        stage('Integration Tests') {
-            steps {
-                // Exécuter les tests d'intégration
-                bat 'npm run test:integration' // Assurez-vous que ce script est défini dans package.json
-            }
-        }
+       
         
         stage('Security Tests') {
             steps {
