@@ -11,7 +11,7 @@ pipeline {
         stage('Build') {
             steps {
                 bat 'npm install' // Installer les dépendances
-                bat 'npm run build' // Construire l'application
+                
             }
         }
         
