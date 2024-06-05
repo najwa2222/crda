@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npm install && npm run test",
-    "test":"jest"
+    "build": "npm install",
+    "test": "jest",
+    "test:integration": "jest --config jest.integration.config.js",
+    "test:security": "npm audit" 
   },
   "author": "",
   "license": "ISC",
