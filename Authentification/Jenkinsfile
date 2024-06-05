@@ -4,13 +4,14 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/najwa2222/crda.git'
+                git branch: 'master', url: 'https://github.com/najwa2222/crda.git'
             }
         }
         
         stage('Build') {
             steps {
-                sh 'npm run build' // Installer les dépendances et construire l'application
+                sh 'npm install' // Installer les dépendances
+                sh 'npm run build' // Construire l'application
             }
         }
         
@@ -35,10 +36,9 @@ pipeline {
         }
         
       
-        
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t najwakarrouchi968/authentification:latest .' // Construire l'image Docker
+                sh 'docker build -t najwakarrouchi968/auth-service:latest .' // Construire l'image Docker
             }
         }
         
@@ -46,7 +46,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin"
-                    sh "docker push najwakarrouchi968/authentification:latest" // Pousser l'image Docker vers Docker Hub
+                    sh "docker push najwakarrouchi968/auth-service:latest" // Pousser l'image Docker vers Docker Hub
                 }
             }
         }
@@ -55,7 +55,7 @@ pipeline {
             steps {
                 script {
                     kubernetesDeploy(
-                        configs: 'k8s/authentification-deployment.yaml',
+                        configs: 'k8s/auth-deployment.yaml',
                         kubeconfigId: 'kubeconfig'
                     )
                 }
