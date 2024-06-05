@@ -2,61 +2,64 @@ pipeline {
     agent any
     
     stages {
-        stage('Préparation') {
+        stage('Checkout') {
             steps {
-                // Checkout du code depuis le dépôt Git
-                git 'https://github.com/najwa2222/crda.git'
-                
-                // Installation des dépendances Node.js ou autre langue/framework
-                bat 'npm install'
+                git branch: 'main', url: 'https://github.com/najwa2222/crda.git'
             }
         }
         
-        stage('Tests') {
+        stage('Build') {
             steps {
-                // Exécution des tests unitaires et d'intégration
-                bat 'npm test'
+                sh 'npm run build' // Installer les dépendances et construire l'application
             }
         }
         
-        stage('Construction') {
+        stage('Unit Tests') {
             steps {
-                // Construction de l'application
-                bat 'npm run build'
+                sh 'npm test' // Exécuter les tests unitaires
             }
         }
         
-        stage('Construction de l\'image Docker') {
+        stage('Integration Tests') {
             steps {
-                // Construction de l'image Docker
-                bat 'docker build -t najwakarrouchi968/auth-service:latest .'
+                // Exécuter les tests d'intégration
+                sh 'npm run test:integration' // Assurez-vous que ce script est défini dans package.json
             }
         }
         
-        stage('Pousser vers Docker Hub') {
+        stage('Security Tests') {
             steps {
-                // Authentification avec Docker Hub
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    bat 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
+                // Exécuter les tests de sécurité
+                sh 'npm run test:security' // Assurez-vous que ce script est défini dans package.json
+            }
+        }
+        
+      
+        
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t najwakarrouchi968/authentification:latest .' // Construire l'image Docker
+            }
+        }
+        
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin"
+                    sh "docker push najwakarrouchi968/authentification:latest" // Pousser l'image Docker vers Docker Hub
                 }
-                
-                // Poussement de l'image vers Docker Hub
-                bat 'docker push najwakarrouchi968/auth-service:latest'
             }
         }
-    }
-    
-    post {
-        // Envoi d'une notification par e-mail en cas de succès ou d'échec du pipeline
-        success {
-            emailext subject: 'Pipeline réussi',
-                      body: 'Le pipeline d\'authentification a été exécuté avec succès.',
-                      to: 'najwakarrouchi@gmail.com'
-        }
-        failure {
-            emailext subject: 'Échec du pipeline',
-                      body: 'Le pipeline d\'authentification a échoué. Veuillez vérifier les logs pour plus de détails.',
-                      to: 'najwakarrouchi@gmail.com'
+        
+        stage('Deploy') {
+            steps {
+                script {
+                    kubernetesDeploy(
+                        configs: 'k8s/authentification-deployment.yaml',
+                        kubeconfigId: 'kubeconfig'
+                    )
+                }
+            }
         }
     }
 }
