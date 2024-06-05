@@ -7,12 +7,12 @@
     "build": "npm install && npm run test",
     "test": "jest",
     "test:integration": "jest --config jest.integration.config.js",
-    "test:security": "nsp check" // Exécution des tests de sécurité
+    "test:security": "nsp check" 
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "jest": "^29.7.0",
-    "nsp": "^3.2.1" // Exemple de dépendance pour les tests de sécurité
+    "nsp": "^3.2.1" 
   }
 }
