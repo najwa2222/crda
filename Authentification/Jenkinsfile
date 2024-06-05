@@ -4,49 +4,48 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/najwa2222/crda.git'
+                git branch: 'master', url: 'https://github.com/najwa2222/crda.git', credentialsId: 'git-credentials'
             }
         }
         
         stage('Build') {
             steps {
-                sh 'npm install' // Installer les dépendances
-                sh 'npm run build' // Construire l'application
+                bat 'npm install' // Installer les dépendances
+                bat 'npm run build' // Construire l'application
             }
         }
         
         stage('Unit Tests') {
             steps {
-                sh 'npm test' // Exécuter les tests unitaires
+                bat 'npm test' // Exécuter les tests unitaires
             }
         }
         
         stage('Integration Tests') {
             steps {
                 // Exécuter les tests d'intégration
-                sh 'npm run test:integration' // Assurez-vous que ce script est défini dans package.json
+                bat 'npm run test:integration' // Assurez-vous que ce script est défini dans package.json
             }
         }
         
         stage('Security Tests') {
             steps {
                 // Exécuter les tests de sécurité
-                sh 'npm run test:security' // Assurez-vous que ce script est défini dans package.json
+                bat 'npm run test:security' // Assurez-vous que ce script est défini dans package.json
             }
         }
         
-      
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t najwakarrouchi968/auth-service:latest .' // Construire l'image Docker
+                bat 'docker build -t najwakarrouchi968/auth-service:latest .' // Construire l'image Docker
             }
         }
         
         stage('Push Docker Image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin"
-                    sh "docker push najwakarrouchi968/auth-service:latest" // Pousser l'image Docker vers Docker Hub
+                    bat "echo %PASSWORD% | docker login -u %USERNAME% --password-stdin"
+                    bat "docker push najwakarrouchi968/auth-service:latest" // Pousser l'image Docker vers Docker Hub
                 }
             }
         }
