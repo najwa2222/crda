@@ -10,28 +10,28 @@ pipeline {
         
         stage('Build') {
             steps {
-                bat 'npm install' // Installer les dépendances
-                bat 'npm run build' // Construire l'application
+                bat 'node 20 install' // Installer les dépendances
+                bat 'node 20 run build' // Construire l'application
             }
         }
         
         stage('Unit Tests') {
             steps {
-                bat 'npm test' // Exécuter les tests unitaires
+                bat 'node 20 test' // Exécuter les tests unitaires
             }
         }
         
         stage('Integration Tests') {
             steps {
                 // Exécuter les tests d'intégration
-                bat 'npm run test:integration' // Assurez-vous que ce script est défini dans package.json
+                bat 'node 20 run test:integration' // Assurez-vous que ce script est défini dans package.json
             }
         }
         
         stage('Security Tests') {
             steps {
                 // Exécuter les tests de sécurité
-                bat 'npm run test:security' // Assurez-vous que ce script est défini dans package.json
+                bat 'node 20 run test:security' // Assurez-vous que ce script est défini dans package.json
             }
         }
         
