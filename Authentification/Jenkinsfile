@@ -9,7 +9,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    git credentialsId: 'github-credentials', url: 'https://github.com/najwa2222/auth-service.git'
+                    git credentialsId: 'github-credentials', url: 'https://github.com/najwa2222/crda.git'
                 }
             }
         }
