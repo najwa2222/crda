@@ -2,13 +2,15 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'najwakarrouchi968/auth-service:latest'
+        DOCKER_IMAGE = 'najwakarrouchi968/authentification:latest'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/najwa2222/auth-service.git'
+                script {
+                    git credentialsId: 'github-credentials', url: 'https://github.com/najwa2222/auth-service.git'
+                }
             }
         }
         
