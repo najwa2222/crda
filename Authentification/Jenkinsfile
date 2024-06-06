@@ -1,54 +1,71 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:20'
+        }
+    }
 
     environment {
+        NODE_ENV = 'production'
         DOCKER_IMAGE = 'najwakarrouchi968/authentification:latest'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                script {
-                    git credentialsId: 'github-credentials', url: 'https://github.com/najwa2222/crda.git'
-                }
+                git url: 'https://github.com/najwa2222/crda.git', branch: 'master'
             }
         }
-        
-        stage('Docker Hub Login') {
+
+        stage('Install Dependencies') {
             steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        bat '''
-                        echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin
-                        '''
-                    }
-                }
+                bat 'npm install'
             }
         }
 
         stage('Build') {
             steps {
-                script {
-                    bat 'docker-compose -f docker-compose.yml build'
-                }
+                bat 'npm install'
             }
         }
-        
+
+        stage('Test') {
+            steps {
+                bat 'npm test'
+            }
+        }
+
         stage('Deploy') {
+            when {
+                anyOf {
+                    branch 'master'
+                }
+            }
             steps {
                 script {
-                    bat 'docker-compose -f docker-compose.yml up -d'
+                    def imageName = env.DOCKER_IMAGE
+
+                    // Construire l'image Docker
+                    bat "docker build -t ${imageName} ."
+
+                    // Se connecter à Docker Hub
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                        bat "echo %DOCKER_HUB_PASSWORD% | docker login -u %DOCKER_HUB_USER% --password-stdin"
+                    }
+
+                    // Pousser l'image Docker
+                    bat "docker push ${imageName}"
                 }
             }
         }
     }
-    
+
     post {
         success {
-            echo 'Backend pipeline succeeded!'
+            echo 'Pipeline terminé avec succès.'
         }
         failure {
-            echo 'Backend pipeline failed!'
+            echo 'Pipeline échoué.'
         }
     }
 }
