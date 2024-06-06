@@ -1,31 +1,33 @@
 pipeline {
     agent any
-    
+
+    environment {
+        DOCKER_IMAGE = 'najwakarrouchi968/auth-service:latest'
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/najwa2222/crda.git', credentialsId: 'git-credentials'
+                git 'https://github.com/najwa2222/auth-service.git'
             }
         }
         
+        stage('Docker Hub Login') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        bat '''
+                        echo %DOCKER_PASSWORD% | docker login -u %DOCKER_USERNAME% --password-stdin
+                        '''
+                    }
+                }
+            }
+        }
+
         stage('Build') {
             steps {
-                bat 'npm install' // Installer les dépendances
-                
-            }
-        }
-        
-        stage('Build Docker Image') {
-            steps {
-                bat 'docker build -t najwakarrouchi968/authentification:latest .' // Construire l'image Docker
-            }
-        }
-        
-        stage('Push Docker Image') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    bat "echo %PASSWORD% | docker login -u %USERNAME% --password-stdin"
-                    bat "docker push najwakarrouchi968/authentification:latest" // Pousser l'image Docker vers Docker Hub
+                script {
+                    bat 'docker-compose -f docker-compose.yml build'
                 }
             }
         }
@@ -33,12 +35,18 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    kubernetesDeploy(
-                        configs: 'k8s/auth-deployment.yaml',
-                        kubeconfigId: 'kubeconfig'
-                    )
+                    bat 'docker-compose -f docker-compose.yml up -d'
                 }
             }
+        }
+    }
+    
+    post {
+        success {
+            echo 'Backend pipeline succeeded!'
+        }
+        failure {
+            echo 'Backend pipeline failed!'
         }
     }
 }
