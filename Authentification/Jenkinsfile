@@ -4,6 +4,7 @@ pipeline {
     environment {
         NODE_ENV = 'production'
         DOCKER_IMAGE = 'najwakarrouchi968/authentification:latest'
+        PATH = "C:\\Program Files\\nodejs;${env.PATH}"
     }
 
     stages {
