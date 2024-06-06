@@ -1,9 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:20'
-        }
-    }
+    agent any
 
     environment {
         NODE_ENV = 'production'
@@ -25,7 +21,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'npm install'
+                bat 'npm run build'
             }
         }
 
