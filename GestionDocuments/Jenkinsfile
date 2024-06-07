@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    checkout scm
+                    git branch: 'master', credentialsId: 'github-credentials', url: 'https://github.com/najwa2222/crda.git'
                 }
             }
         }
@@ -20,8 +20,6 @@ pipeline {
             steps {
                 script {
                     bat 'npm install'
-                    // Vous pouvez exécuter les tests ici si nécessaire
-                    // bat 'npm test'
                 }
             }
         }
@@ -39,6 +37,20 @@ pipeline {
                 script {
                     // Construire l'image Docker
                     bat 'docker build -t nom_image:tag .'
+                }
+            }
+        }
+        
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                script {
+                    // Se connecter à Docker Hub avec les identifiants appropriés
+                    withCredentials([usernamePassword(credentialsId: 'github-credentials', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                        bat "echo %DOCKER_HUB_PASSWORD% | docker login -u %DOCKER_HUB_USER% --password-stdin"
+                    }
+
+                    // Pousser l'image Docker
+                    bat "docker push ${imageName}"
                 }
             }
         }
