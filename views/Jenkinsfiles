@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/najwa2222/crda/views.git'
+                git 'https://github.com/najwa2222/crda.git'
             }
         }
 
