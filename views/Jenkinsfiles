@@ -43,7 +43,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    sh 'kubectl apply -f kubernetes/deployment-views.yaml'
+                    sh 'kubectl apply -f /kubernetes/deployment-views.yaml'
                 }
             }
         }
