@@ -11,14 +11,9 @@ pipeline {
                 git 'https://github.com/najwa2222/crda.git'
             }
         }
-        stage('Check directory') {
-            steps {
-                bat 'dir'
-            }
-        }
         stage('Build views') {
             steps {
-                bat 'docker build -t views:latest -f Dockerfile.views .'
+                bat 'docker build -t views:latest -f views/Dockerfile .'
             }
         }
         stage('Test') {
@@ -33,4 +28,3 @@ pipeline {
         }
     }
 }
-
