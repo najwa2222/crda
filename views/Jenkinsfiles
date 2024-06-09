@@ -10,9 +10,10 @@ pipeline {
 
         stage('Build') {
             steps {
-                script {
-                    bat 'docker build -t "najwakarrouchi968/views:latest" views/.'
-
+                dir('views') {
+                    script {
+                        bat 'docker build -t najwakarrouchi968/views:latest .'
+                    }
                 }
             }
         }
@@ -20,6 +21,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
+                    def dockerImage = docker.build('najwakarrouchi968/views:latest', 'views/.')
                     dockerImage.inside {
                         sh 'npm install'
                         sh 'npm test'
@@ -41,7 +43,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    sh 'kubectl.apply -f /kubernetes/deployment-views.yaml'
+                    sh 'kubectl apply -f kubernetes/deployment-views.yaml'
                 }
             }
         }
