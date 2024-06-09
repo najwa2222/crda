@@ -1,5 +1,4 @@
 module.exports = {
-  // Spécifiez le répertoire dans lequel se trouvent vos tests
-  roots: ["<rootDir>/tests"],
-  // Autres configurations de Jest...
+  testMatch: ["**/__tests__/**/*.js", "**/?(*.)+(spec|test).js"],
+  testPathIgnorePatterns: ["/node_modules/"],
 };
