@@ -12,7 +12,7 @@ pipeline {
             steps {
                 dir('views') {
                     script {
-                        bat 'docker build -t najwakarrouchi968/views:latest .'
+                        bat 'docker build -t najwakarrouchi968/views:version2 .'
                     }
                 }
             }
@@ -21,7 +21,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    def dockerImage = docker.build('najwakarrouchi968/views:latest', 'views/.')
+                    def dockerImage = docker.build('najwakarrouchi968/views:version2', 'views/.')
                     dockerImage.inside {
                         sh 'npm install'
                         sh 'npm test'
