@@ -11,7 +11,8 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    dockerImage = docker.build("najwakarrouchi968/views:latest")
+                    bat 'docker build -t "najwakarrouchi968/views:latest" views/.'
+
                 }
             }
         }
