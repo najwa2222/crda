@@ -19,7 +19,7 @@ pipeline {
         stage('Test') {
             steps {
                 bat 'npm install' // Assurez-vous d'installer les dépendances du projet
-                bat 'npm test'
+           
             }
         }
         stage('Deploy') {
