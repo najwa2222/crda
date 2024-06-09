@@ -1,50 +1,19 @@
 pipeline {
     agent any
-
-    stages {
-        stage('Checkout') {
+   
+        stage('Build views') {
             steps {
-                git 'https://github.com/najwa2222/crda.git'
+                sh 'docker build -t views:latest -f Dockerfile.views .'
             }
         }
-
-        stage('Build') {
-            steps {
-                dir('views') {
-                    script {
-                        bat 'docker build -t najwakarrouchi968/views:version2 .'
-                    }
-                }
-            }
-        }
-
         stage('Test') {
             steps {
-                script {
-                    def dockerImage = docker.build('najwakarrouchi968/views:version2', 'views/.')
-                    dockerImage.inside {
-                        sh 'npm install'
-                        sh 'npm test'
-                    }
-                }
+                sh 'npm test'
             }
         }
-
-        stage('Push') {
-            steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
-                        dockerImage.push()
-                    }
-                }
-            }
-        }
-
         stage('Deploy') {
             steps {
-                script {
-                    sh 'kubectl apply -f /kubernetes/deployment-views.yaml'
-                }
+                sh 'docker-compose up -d'
             }
         }
     }
