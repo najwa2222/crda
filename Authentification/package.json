@@ -8,14 +8,11 @@
     "test": "jest",
     "test:integration": "jest --config jest.integration.config.js",
     "test:security": "nsp check"
-  }
-},
-
-  
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "jest": "^29.7.0",
     "nsp": "^3.2.1" 
   }
-
+}
