@@ -28,7 +28,7 @@ services:
     ports:
       - "3005:3005"
     environment:
-      - ELASTICSEARCH_URI=http://elasticsearch:9200
+      - ELASTICSEARCH_URI=http://elasticsearch:9201
 
   enregistrement:
     build: ./enregistrement
