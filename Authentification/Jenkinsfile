@@ -2,25 +2,50 @@ pipeline {
     agent any
 
     environment {
-        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\nodejs;${env.PATH}"
+        DOCKER_IMAGE = 'najwakarrouchi968/authentification:version4' // Image Docker Hub
+        CONTAINER_NAME = 'authentification-authentification' // Nom du conteneur dans Docker Desktop
+        PORT = '4200' // Port sur lequel l'application s'exécute
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/najwa2222/crda.git'
+                git 'https://github.com/votre-utilisateur/votre-projet.git'
             }
         }
-        stage('Test') {
+
+        stage('Build Docker Image') {
             steps {
-                bat 'npm install' // Ensure to install the project dependencies
+                script {
+                    docker.build env.DOCKER_IMAGE
+                }
             }
         }
+
         stage('Deploy') {
             steps {
-               
-                bat 'docker-compose up -d'
+                script {
+                    // Supprimer le conteneur s'il existe déjà
+                    sh "docker rm -f ${env.CONTAINER_NAME} || true"
+                    // Démarrer le conteneur avec l'image Docker construite précédemment
+                    sh "docker run -d -p ${env.PORT}:4200 --name ${env.CONTAINER_NAME} ${env.DOCKER_IMAGE}"
+                }
             }
+        }
+
+        stage('Test') {
+            steps {
+                // Ici vous pouvez ajouter des étapes de test si nécessaire
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Le déploiement a réussi!'
+        }
+        failure {
+            echo 'Le déploiement a échoué. Veuillez vérifier les logs pour plus de détails.'
         }
     }
 }
