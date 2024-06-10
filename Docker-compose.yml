@@ -89,7 +89,7 @@ services:
   grafana:
     image: grafana/grafana
     ports:
-      - "3008:3000"  # Changed port to 3008
+      - "3008:3000"  # Changed port to 3008 to avoid conflict
     volumes:
       - grafana-data:/var/lib/grafana
 
