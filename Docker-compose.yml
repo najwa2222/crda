@@ -84,7 +84,8 @@ services:
     ports:
       - "9093:9090"
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      # Ensure the prometheus.yml file exists at this path on the host
+      - C:/ProgramData/Jenkins/.jenkins/workspace/authentification/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
 
   grafana:
     image: grafana/grafana
