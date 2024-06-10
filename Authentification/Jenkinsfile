@@ -17,7 +17,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build env.DOCKER_IMAGE
+                    bat "docker build -t ${env.DOCKER_IMAGE} ."
                 }
             }
         }
@@ -26,9 +26,9 @@ pipeline {
             steps {
                 script {
                     // Supprimer le conteneur s'il existe déjà
-                    sh "docker rm -f ${env.CONTAINER_NAME} || true"
+                    bat "docker rm -f ${env.CONTAINER_NAME} || true"
                     // Démarrer le conteneur avec l'image Docker construite précédemment
-                    sh "docker run -d -p ${env.PORT}:4200 --name ${env.CONTAINER_NAME} ${env.DOCKER_IMAGE}"
+                    bat "docker run -d -p ${env.PORT}:4200 --name ${env.CONTAINER_NAME} ${env.DOCKER_IMAGE}"
                 }
             }
         }
@@ -36,6 +36,7 @@ pipeline {
         stage('Test') {
             steps {
                 // Ici vous pouvez ajouter des étapes de test si nécessaire
+                echo 'Exécution des tests...'
             }
         }
     }
