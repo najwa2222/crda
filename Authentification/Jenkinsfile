@@ -4,12 +4,6 @@ pipeline {
     environment {
         PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\nodejs;${env.PATH}"
     }
-pipeline {
-    agent any
-
-    environment {
-        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\nodejs;${env.PATH}"
-    }
 
     stages {
         stage('Checkout') {
@@ -19,7 +13,11 @@ pipeline {
         }
         stage('Build Services') {
             steps {
-                bat 'docker-compose -f app/docker-compose.yml build'
+                script {
+                    // Vérifiez et imprimez le contenu du répertoire pour le débogage
+                    bat 'dir'
+                    bat 'docker-compose -f Docker-compose.yml build'
+                }
             }
         }
         stage('Test') {
@@ -30,34 +28,9 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    def dockerComposePath = "C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\authentification\\app\\docker-compose.yml"
+                    def dockerComposePath = "C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\authentification\\Docker-compose.yml"
                     bat "docker-compose -f ${dockerComposePath} up -d"
                 }
-            }
-        }
-    }
-}
-
-    stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/najwa2222/crda.git'
-            }
-        }
-        stage('Build authentification') {
-            steps {
-                bat 'docker build -t authentification:latest -f authentification/Dockerfile .'
-            }
-        }
-        stage('Test') {
-            steps {
-                bat 'npm install' // Assurez-vous d'installer les dépendances du projet
-           
-            }
-        }
-        stage('Deploy') {
-            steps {
-                bat 'docker-compose up -d'
             }
         }
     }
