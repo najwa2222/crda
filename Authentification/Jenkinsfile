@@ -11,7 +11,7 @@ pipeline {
                 git 'https://github.com/najwa2222/crda.git'
             }
         }
-        stage('Build Services') {
+        stage('Build authentification') {
             steps {
                 script {
                     // Vérifiez et imprimez le contenu du répertoire pour le débogage
