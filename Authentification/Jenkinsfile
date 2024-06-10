@@ -2,51 +2,30 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'najwakarrouchi968/authentification:version4' // Image Docker Hub
-        CONTAINER_NAME = 'authentification-authentification' // Nom du conteneur dans Docker Desktop
-        PORT = '4200' // Port sur lequel l'application s'exécute
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\nodejs;${env.PATH}"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/najwa2222/crda.git' // Modifier l'URL Git ici
+                git 'https://github.com/najwa2222/crda.git'
             }
         }
-
-        stage('Build Docker Image') {
+        stage('Build authentification') {
             steps {
-                script {
-                    bat "docker build -t ${env.DOCKER_IMAGE} ."
-                }
+                bat 'docker build -t authentification:latest -f authentification/Dockerfile .'
             }
         }
-
-        stage('Deploy') {
-            steps {
-                script {
-                    // Supprimer le conteneur s'il existe déjà
-                    bat "docker rm -f ${env.CONTAINER_NAME} || true"
-                    // Démarrer le conteneur avec l'image Docker construite précédemment
-                    bat "docker run -d -p ${env.PORT}:4200 --name ${env.CONTAINER_NAME} ${env.DOCKER_IMAGE}"
-                }
-            }
-        }
-
         stage('Test') {
             steps {
-                // Ici vous pouvez ajouter des étapes de test si nécessaire
-                echo 'Exécution des tests...'
+                bat 'npm install' // Assurez-vous d'installer les dépendances du projet
+           
             }
         }
-    }
-
-    post {
-        success {
-            echo 'Le déploiement a réussi!'
-        }
-        failure {
-            echo 'Le déploiement a échoué. Veuillez vérifier les logs pour plus de détails.'
+        stage('Deploy') {
+            steps {
+                bat 'docker-compose up -d'
+            }
         }
     }
 }
