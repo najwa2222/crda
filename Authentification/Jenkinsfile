@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Prozgram Files\\nodejs;${env.PATH}"
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\nodejs;${env.PATH}"
     }
 
     stages {
@@ -14,22 +14,39 @@ pipeline {
         stage('Build authentification') {
             steps {
                 script {
-                    // Vérifiez et imprimez le contenu du répertoire pour le débogage
-                  
-                    bat 'docker-compose -f Docker-compose.yml build'
+                    def dockerBuildStatus = bat(
+                        script: 'docker build -t authentification:latest -f authentification/Dockerfile .',
+                        returnStatus: bat
+                    )
+                    if (dockerBuildStatus != 0) {
+                        error "Docker build failed with status: ${dockerBuildStatus}"
+                    }
                 }
             }
         }
         stage('Test') {
             steps {
-                bat 'npm install' // Assurez-vous d'installer les dépendances du projet
+                script {
+                    def npmInstallStatus = bat(
+                        script: 'npm install',
+                        returnStatus: bat
+                    )
+                    if (npmInstallStatus != 0) {
+                        error "npm install failed with status: ${npmInstallStatus}"
+                    }
+                }
             }
         }
         stage('Deploy') {
             steps {
                 script {
-                    def dockerComposePath = "C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\authentification\\Docker-compose.yml"
-                    bat "docker-compose -f ${dockerComposePath} up -d"
+                    def dockerComposeUpStatus = bat(
+                        script: 'docker-compose up -d',
+                        returnStatus: bat
+                    )
+                    if (dockerComposeUpStatus != 0) {
+                        error "docker-compose up failed with status: ${dockerComposeUpStatus}"
+                    }
                 }
             }
         }
