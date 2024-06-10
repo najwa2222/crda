@@ -87,7 +87,7 @@ services:
   grafana:
     image: grafana/grafana
     ports:
-      - "3006:3000"
+      - "3007:3000"
     volumes:
       - grafana-data:/var/lib/grafana
 
