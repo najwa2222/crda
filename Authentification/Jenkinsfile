@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\nodejs;${env.PATH}"
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Prozgram Files\\nodejs;${env.PATH}"
     }
 
     stages {
@@ -15,7 +15,7 @@ pipeline {
             steps {
                 script {
                     // Vérifiez et imprimez le contenu du répertoire pour le débogage
-                    bat 'dir'
+                  
                     bat 'docker-compose -f Docker-compose.yml build'
                 }
             }
