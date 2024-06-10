@@ -2,67 +2,25 @@ pipeline {
     agent any
 
     environment {
-        NODE_ENV = 'production'
-        DOCKER_IMAGE = 'najwakarrouchi968/authentification:latest'
-        PATH = "C:\\Program Files\\nodejs;${env.PATH}"
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\nodejs;${env.PATH}"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/najwa2222/crda.git', branch: 'master'
+                git 'https://github.com/najwa2222/crda.git'
             }
         }
-
-        stage('Install Dependencies') {
-            steps {
-                bat 'npm install'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                bat 'npm run build'
-            }
-        }
-
         stage('Test') {
             steps {
-                bat 'npm test'
+                bat 'npm install' // Ensure to install the project dependencies
             }
         }
-
         stage('Deploy') {
-            when {
-                anyOf {
-                    branch 'master'
-                }
-            }
             steps {
-                script {
-                    def imageName = env.DOCKER_IMAGE
-
-                    // Construire l'image Docker
-                    bat "docker build -t ${imageName} ."
-
-                    // Se connecter à Docker Hub
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
-                        bat "echo %DOCKER_HUB_PASSWORD% | docker login -u %DOCKER_HUB_USER% --password-stdin"
-                    }
-
-                    // Pousser l'image Docker
-                    bat "docker push ${imageName}"
-                }
+                bat 'docker-compose pull' // Pull the latest images from Docker registry
+                bat 'docker-compose up -d'
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline terminé avec succès.'
-        }
-        failure {
-            echo 'Pipeline échoué.'
         }
     }
 }
