@@ -40,6 +40,10 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
+                    // Vérifiez l'existence du fichier prometheus.yml avant de continuer
+                    if (!fileExists("C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\authentification\\prometheus\\prometheus.yml")) {
+                        error "Le fichier prometheus.yml n'existe pas à l'emplacement spécifié"
+                    }
                     def dockerComposeUpStatus = bat(
                         script: 'docker-compose up -d',
                         returnStatus: true
