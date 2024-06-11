@@ -41,11 +41,11 @@ pipeline {
             steps {
                 script {
                     // Vérifiez l'existence du fichier prometheus.yml avant de continuer
-                    if (!fileExists("C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\authentification\\prometheus\\prometheus.yml")) {
+                    if (!fileExists("C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\authentification@2\\prometheus\\prometheus.yml")) {
                         error "Le fichier prometheus.yml n'existe pas à l'emplacement spécifié"
                     }
                     def dockerComposeUpStatus = bat(
-                        script: 'docker-compose up -d',
+                        script: 'docker-compose up -d --timeout 120',
                         returnStatus: true
                     )
                     if (dockerComposeUpStatus != 0) {
