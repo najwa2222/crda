@@ -16,7 +16,7 @@ pipeline {
                 script {
                     def dockerBuildStatus = bat(
                         script: 'docker build -t authentification:latest -f authentification/Dockerfile .',
-                        returnStatus: bat
+                        returnStatus: true
                     )
                     if (dockerBuildStatus != 0) {
                         error "Docker build failed with status: ${dockerBuildStatus}"
@@ -29,7 +29,7 @@ pipeline {
                 script {
                     def npmInstallStatus = bat(
                         script: 'npm install',
-                        returnStatus: bat
+                        returnStatus: true
                     )
                     if (npmInstallStatus != 0) {
                         error "npm install failed with status: ${npmInstallStatus}"
@@ -42,12 +42,24 @@ pipeline {
                 script {
                     def dockerComposeUpStatus = bat(
                         script: 'docker-compose up -d',
-                        returnStatus: bat
+                        returnStatus: true
                     )
                     if (dockerComposeUpStatus != 0) {
                         error "docker-compose up failed with status: ${dockerComposeUpStatus}"
                     }
                 }
+            }
+        }
+    }
+    post {
+        failure {
+            script {
+                echo 'Pipeline failed!'
+            }
+        }
+        success {
+            script {
+                echo 'Pipeline succeeded!'
             }
         }
     }
