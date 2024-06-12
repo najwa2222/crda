@@ -29,7 +29,7 @@ pipeline {
                 script {
                     // Check if Dockerfile exists
                     echo "Checking if Dockerfile exists..."
-                    bat "dir ${DOCKERFILE_PATH}"  // List files in the directory for verification
+                    bat " ${DOCKERFILE_PATH}"  // List files in the directory for verification
                 }
             }
         }
