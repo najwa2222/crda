@@ -9,7 +9,8 @@ pipeline {
         DOCKER_IMAGE = 'najwakarrouchi/gestiondocuments'
         DOCKER_TAG = 'latest'
         KUBECONFIG = 'C:\\Users\\acer\\.kube\\config'  // Update this path to your actual kubeconfig path
-       
+        DOCKERFILE_PATH = 'GestionDocuments/Dockerfile'  // Correct path to your Dockerfile
+    }
 
     stages {
         stage('Set Up Environment') {
@@ -23,7 +24,6 @@ pipeline {
             }
         }
 
-    
         stage('Build Docker Image') {
             steps {
                 script {
@@ -33,8 +33,6 @@ pipeline {
                 }
             }
         }
-
-       
 
         stage('Verify Docker Image') {
             steps {
