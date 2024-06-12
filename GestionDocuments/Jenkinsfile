@@ -49,11 +49,9 @@ pipeline {
         stage('Deploy with kubectl') {
             steps {
                 script {
-                    // Vérifier l'existence de l'espace de nom, le créer sinon
-                    bat "kubectl get namespace ${KUBERNETES_NAMESPACE} || kubectl create namespace ${KUBERNETES_NAMESPACE}"
-                    
+                   
                     // Appliquer le fichier YAML de déploiement
-                    bat "kubectl apply -f ${DEPLOYMENT_YAML} -n ${KUBERNETES_NAMESPACE}"
+                    bat "kubectl apply -f ${DEPLOYMENT_YAML} -n ${gestiondocuments}"
                 }
             }
         }
