@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_PATH = 'C:\\Program Files\\Docker\\cli-plugins'
         PATH = "${DOCKER_PATH};${PATH}"
-        KUBERNETES_NAMESPACE = 'scheduling'  // Change this to your desired namespace
+        KUBERNETES_NAMESPACE = 'gestiondocuments'  // Change this to your desired namespace
         KUBERNETES_DEPLOYMENT = 'backend'
         DOCKER_IMAGE = 'najwakarrouchi/gestiondocuments'
         DOCKER_TAG = 'latest'
@@ -55,11 +55,11 @@ pipeline {
                     kubectl config use-context docker-desktop
                     kubectl cluster-info
                     kubectl get nodes
-                    kubectl get namespace ${KUBERNETES_NAMESPACE} || kubectl create namespace ${KUBERNETES_NAMESPACE}
-                    kubectl apply -f docker/configMap.yml -n ${KUBERNETES_NAMESPACE}
-                    kubectl apply -f docker/mysqldep.yml -n ${KUBERNETES_NAMESPACE}
-                    kubectl apply -f docker/persistent.yaml -n ${KUBERNETES_NAMESPACE}
-                    kubectl apply -f deployment.yaml -n ${KUBERNETES_NAMESPACE}
+                    kubectl get namespace ${gestiondocuments} || kubectl create namespace ${gestiondocuments}
+                    kubectl apply -f docker/configMap.yml -n ${gestiondocuments}
+                    kubectl apply -f docker/mysqldep.yml -n ${gestiondocuments}
+                    kubectl apply -f docker/persistent.yaml -n ${gestiondocuments}
+                    kubectl apply -f deployment.yaml -n ${gestiondocuments}
                     '''
                 }
             }
