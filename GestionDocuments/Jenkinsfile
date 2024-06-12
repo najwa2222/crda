@@ -4,12 +4,11 @@ pipeline {
     environment {
         DOCKER_PATH = 'C:\\Program Files\\Docker\\cli-plugins'
         PATH = "${DOCKER_PATH};${PATH}"
-        KUBERNETES_NAMESPACE = 'gestiondocuments'  // Change this to your desired namespace
+        KUBERNETES_NAMESPACE = 'scheduling'  // Change this to your desired namespace
         KUBERNETES_DEPLOYMENT = 'backend'
         DOCKER_IMAGE = 'najwakarrouchi/gestiondocuments'
         DOCKER_TAG = 'latest'
         KUBECONFIG = 'C:\\Users\\acer\\.kube\\config'  // Update this path to your actual kubeconfig path
-        DOCKERFILE_PATH = 'GestionDocuments/Dockerfile'  // Correct path to your Dockerfile
     }
 
     stages {
@@ -24,23 +23,14 @@ pipeline {
             }
         }
 
-        stage('Check Dockerfile') {
-            steps {
-                script {
-                    // Check if Dockerfile exists
-                    echo "Checking if Dockerfile exists..."
-                    bat "dir"
-                    bat "if not exist ${DOCKERFILE_PATH} (echo Dockerfile not found & exit /b 1)"
-                }
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 script {
                     // Build and tag the Docker image
                     echo "Building Docker image..."
-                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${DOCKERFILE_PATH} ."
+                    // Specify the correct path to Dockerfile if it's not in the root directory
+                    def dockerfilePath = 'path/to/Dockerfile' // Update this if your Dockerfile is in a different directory
+                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${dockerfilePath} ."
                 }
             }
         }
@@ -81,11 +71,11 @@ pipeline {
                     kubectl config use-context docker-desktop
                     kubectl cluster-info
                     kubectl get nodes
-                    kubectl get namespace gestiondocuments || kubectl create namespace gestiondocuments
-                    kubectl apply -f docker/configMap.yml -n gestiondocuments
-                    kubectl apply -f docker/mysqldep.yml -n gestiondocuments
-                    kubectl apply -f docker/persistent.yaml -n gestiondocuments
-                    kubectl apply -f deployment.yaml -n gestiondocuments
+                    kubectl get namespace scheduling || kubectl create namespace scheduling
+                    kubectl apply -f docker/configMap.yml -n scheduling
+                    kubectl apply -f docker/mysqldep.yml -n scheduling
+                    kubectl apply -f docker/persistent.yaml -n scheduling
+                    kubectl apply -f deployment.yaml -n scheduling
                     '''
                 }
             }
