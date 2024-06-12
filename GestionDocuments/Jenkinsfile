@@ -9,6 +9,7 @@ pipeline {
         DOCKER_IMAGE = 'najwakarrouchi/gestiondocuments'
         DOCKER_TAG = 'latest'
         KUBECONFIG = 'C:\\Users\\acer\\.kube\\config'  // Update this path to your actual kubeconfig path
+        DOCKERFILE_PATH = 'Dockerfile'  // Update this if your Dockerfile is in a subdirectory
     }
 
     stages {
@@ -23,12 +24,22 @@ pipeline {
             }
         }
 
+        stage('Check Dockerfile') {
+            steps {
+                script {
+                    // Check if Dockerfile exists
+                    echo "Checking if Dockerfile exists..."
+                    bat "if not exist ${DOCKERFILE_PATH} (echo Dockerfile not found & exit /b 1)"
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
                     // Build and tag the Docker image
                     echo "Building Docker image..."
-                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${DOCKERFILE_PATH} ."
                 }
             }
         }
