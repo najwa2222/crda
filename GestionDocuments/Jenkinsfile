@@ -24,13 +24,22 @@ pipeline {
             }
         }
 
+        stage('Check Dockerfile') {
+            steps {
+                script {
+                    // Check if Dockerfile exists
+                    echo "Checking if Dockerfile exists..."
+                    bat "dir ${DOCKERFILE_PATH}"  // List files in the directory for verification
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
                     // Build and tag the Docker image
                     echo "Building Docker image..."
-                    def dockerfilePath = 'GestionDocuments/Dockerfile' // Update this if your Dockerfile is in a different directory
-                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${dockerfilePath} ."
+                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${DOCKERFILE_PATH} ."
                 }
             }
         }
