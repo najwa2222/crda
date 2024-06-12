@@ -8,7 +8,7 @@ pipeline {
         KUBERNETES_DEPLOYMENT = 'backend'
         DOCKER_IMAGE = 'najwakarrouchi/gestiondocuments'
         DOCKER_TAG = 'latest'
-        KUBECONFIG = 'C:\Users\acer\.kube\\config'  // Update this path to your actual kubeconfig path
+        KUBECONFIG = 'C:\\Users\\acer\\.kube\\config'  // Update this path to your actual kubeconfig path
     }
 
     stages {
