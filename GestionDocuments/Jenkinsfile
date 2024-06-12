@@ -9,7 +9,7 @@ pipeline {
         DOCKER_IMAGE = 'najwakarrouchi/gestiondocuments'
         DOCKER_TAG = 'latest'
         KUBECONFIG = 'C:\\Users\\acer\\.kube\\config'  // Update this path to your actual kubeconfig path
-        DOCKERFILE_PATH = 'GestionDocuments/Dockerfile'  // Correct path to your Dockerfile
+        DOCKERFILE_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\test\\GestionDocuments\\Dockerfile'  // Absolute path to your Dockerfile
     }
 
     stages {
@@ -55,11 +55,11 @@ pipeline {
                     kubectl config use-context docker-desktop
                     kubectl cluster-info
                     kubectl get nodes
-                    kubectl get namespace ${gestiondocuments} || kubectl create namespace ${gestiondocuments}
-                    kubectl apply -f docker/configMap.yml -n ${gestiondocuments}
-                    kubectl apply -f docker/mysqldep.yml -n ${gestiondocuments}
-                    kubectl apply -f docker/persistent.yaml -n ${gestiondocuments}
-                    kubectl apply -f deployment.yaml -n ${gestiondocuments}
+                    kubectl get namespace ${KUBERNETES_NAMESPACE} || kubectl create namespace ${KUBERNETES_NAMESPACE}
+                    kubectl apply -f docker/configMap.yml -n ${KUBERNETES_NAMESPACE}
+                    kubectl apply -f docker/mysqldep.yml -n ${KUBERNETES_NAMESPACE}
+                    kubectl apply -f docker/persistent.yaml -n ${KUBERNETES_NAMESPACE}
+                    kubectl apply -f deployment.yaml -n ${KUBERNETES_NAMESPACE}
                     '''
                 }
             }
