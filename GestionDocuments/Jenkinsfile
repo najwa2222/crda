@@ -9,6 +9,7 @@ pipeline {
         DOCKER_IMAGE = 'najwakarrouchi/gestiondocuments'
         DOCKER_TAG = 'latest'
         KUBECONFIG = 'C:\\Users\\acer\\.kube\\config'  // Update this path to your actual kubeconfig path
+        DOCKERFILE_PATH = 'GestionDocuments/Dockerfile'  // Correct path to your Dockerfile
     }
 
     stages {
@@ -28,8 +29,7 @@ pipeline {
                 script {
                     // Build and tag the Docker image
                     echo "Building Docker image..."
-                    // Specify the correct path to Dockerfile if it's not in the root directory
-                    def dockerfilePath = 'path/to/Dockerfile' // Update this if your Dockerfile is in a different directory
+                    def dockerfilePath = 'GestionDocuments/Dockerfile' // Update this if your Dockerfile is in a different directory
                     bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${dockerfilePath} ."
                 }
             }
