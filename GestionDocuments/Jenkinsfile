@@ -53,16 +53,12 @@ pipeline {
                     // Vérifier l'existence de l'espace de nom, le créer sinon
                     bat "kubectl get namespace ${KUBERNETES_NAMESPACE} || kubectl create namespace ${KUBERNETES_NAMESPACE}"
                     
-                    // Appliquer les configurations Kubernetes avec les chemins complets
-                    bat "kubectl apply -f \"${YAML_FOLDER_PATH}configMap.yml\" -n ${KUBERNETES_NAMESPACE}"
-                    bat "kubectl apply -f \"${YAML_FOLDER_PATH}mysqldep.yml\" -n ${KUBERNETES_NAMESPACE}"
-                    bat "kubectl apply -f \"${YAML_FOLDER_PATH}persistent.yaml\" -n ${KUBERNETES_NAMESPACE}"
-                    bat "kubectl apply -f \"${YAML_FOLDER_PATH}deployment.yaml\" -n ${KUBERNETES_NAMESPACE}"
+                    // Appliquer le fichier YAML de déploiement
+                    bat "kubectl apply -f ${DEPLOYMENT_YAML} -n ${KUBERNETES_NAMESPACE}"
                 }
             }
         }
-    }
-
+    
     post {
         always {
             echo "Pipeline terminée"
