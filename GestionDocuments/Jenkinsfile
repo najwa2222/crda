@@ -29,6 +29,7 @@ pipeline {
                 script {
                     // Check if Dockerfile exists
                     echo "Checking if Dockerfile exists..."
+                    bat "dir"
                     bat "if not exist ${DOCKERFILE_PATH} (echo Dockerfile not found & exit /b 1)"
                 }
             }
