@@ -13,6 +13,85 @@ pipeline {
         YAML_FOLDER_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\test\\kubernetes\\'
         DEPLOYMENT_YAML = "${YAML_FOLDER_PATH}deployment.yaml"
     }
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_PATH = 'C:\\Program Files\\Docker\\cli-plugins'
+        PATH = "${DOCKER_PATH};${env.PATH}"
+        KUBERNETES_NAMESPACE = 'gestiondocuments'
+        KUBERNETES_DEPLOYMENT = 'backend'
+        DOCKER_IMAGE = 'najwakarrouchi/gestiondocuments'
+        DOCKER_TAG = 'latest'
+        KUBECONFIG = 'C:\\Users\\acer\\.kube\\config'
+        DOCKERFILE_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\app\\backend\\GestionDocuments\\Dockerfile'
+        YAML_FOLDER_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\test\\kubernetes\\'
+        DEPLOYMENT_YAML = "${YAML_FOLDER_PATH}deployment.yaml"
+    }
+
+    stages {
+        stage('Set Up Environment') {
+            steps {
+                script {
+                    echo "Configuration de l'environnement..."
+                    bat "echo Configuration du chemin Docker : ${DOCKER_PATH}"
+                    bat "echo Configuration de KUBECONFIG : ${KUBECONFIG}"
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo "Construction de l'image Docker..."
+                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${DOCKERFILE_PATH.replace('\\', '/')}"
+                }
+            }
+        }
+
+        stage('Verify Docker Image') {
+            steps {
+                script {
+                    echo "Vérification et récupération de l'image Docker..."
+                    bat """
+                    docker pull ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    docker images ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    """
+                }
+            }
+        }
+
+        stage('Check Deployment File') {
+            steps {
+                script {
+                    echo "Vérification de l'existence du fichier de déploiement..."
+                    bat "dir ${YAML_FOLDER_PATH.replace('\\', '/')}"
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    echo 'Current directory:'
+                    bat 'cd'
+                    
+                    echo 'Listing files in directory:'
+                    bat 'dir C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\test\\kubernetes\\'
+                    
+                    echo 'Applying Kubernetes deployment:'
+                    bat 'kubectl apply -f C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\test\\kubernetes\\deployment.yaml -n gestiondocuments'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline terminée"
+        }
+    }
+}
 
     stages {
         stage('Set Up Environment') {
