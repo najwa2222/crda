@@ -8,7 +8,7 @@ pipeline {
         DOCKER_TAG = 'latest'
         KUBECONFIG = 'C:\\Users\\acer\\.kube\\config'
         DOCKERFILE_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\app\\backend\\GestionDocuments\\Dockerfile'
-        YAML_FOLDER_PATH = 'C:\\ProgramData\\Jenkins\\workspace\\test\\kubernetes\\'
+        YAML_FOLDER_PATH = "C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\projet\\kubernetes\\"
         DEPLOYMENT_YAML = "${YAML_FOLDER_PATH}deployment.yaml"
     }
 
