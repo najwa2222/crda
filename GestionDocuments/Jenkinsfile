@@ -10,9 +10,9 @@ pipeline {
         DOCKER_TAG = 'latest'
         KUBECONFIG = 'C:\\Users\\acer\\.kube\\config'
         DOCKERFILE_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\app\\backend\\GestionDocuments\\Dockerfile'
-        DOCKER_CONTEXT = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\app\\backend\\GestionDocuments'
         YAML_FOLDER_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\test\\kubernetes\\'
         DEPLOYMENT_YAML = "${YAML_FOLDER_PATH}deployment.yaml"
+        DOCKER_CONTEXT = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\app\\backend\\GestionDocuments'
     }
 
     stages {
@@ -56,16 +56,14 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy with kubectl') {
             steps {
                 script {
-                    echo 'Répertoire courant :'
-                    bat 'cd'
+                    echo "Déploiement avec kubectl..."
+                    // Vérifier l'existence de l'espace de nom, le créer sinon
+                    bat "kubectl get namespace ${KUBERNETES_NAMESPACE} || kubectl create namespace ${KUBERNETES_NAMESPACE}"
                     
-                    echo 'Liste des fichiers dans le répertoire :'
-                    bat "dir ${YAML_FOLDER_PATH.replace('\\', '/')}"
-                    
-                    echo 'Application du déploiement Kubernetes :'
+                    // Appliquer le fichier YAML de déploiement
                     bat "kubectl apply -f ${DEPLOYMENT_YAML.replace('\\', '/')} -n ${KUBERNETES_NAMESPACE}"
                 }
             }
