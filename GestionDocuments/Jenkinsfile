@@ -3,14 +3,13 @@ pipeline {
 
     environment {
         DOCKER_PATH = 'C:\\Program Files\\Docker\\cli-plugins'
-        PATH = "${DOCKER_PATH};${env.PATH}"
+        PATH = "${DOCKER_PATH};${PATH}"
         KUBERNETES_NAMESPACE = 'gestiondocuments'
         KUBERNETES_DEPLOYMENT = 'backend'
         DOCKER_IMAGE = 'najwakarrouchi/gestiondocuments'
         DOCKER_TAG = 'latest'
         KUBECONFIG = 'C:\\Users\\acer\\.kube\\config'
         DOCKERFILE_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\app\\backend\\GestionDocuments\\Dockerfile'
-        DOCKER_CONTEXT = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\app\\backend\\GestionDocuments'
         YAML_FOLDER_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\test\\kubernetes\\'
         DEPLOYMENT_YAML = "${YAML_FOLDER_PATH}deployment.yaml"
     }
@@ -20,8 +19,8 @@ pipeline {
             steps {
                 script {
                     echo "Configuration de l'environnement..."
-                    bat "echo Configuration du chemin Docker : ${DOCKER_PATH}"
-                    bat "echo Configuration de KUBECONFIG : ${KUBECONFIG}"
+                    bat "echo 'Configuration du chemin Docker : ${DOCKER_PATH}'"
+                    bat "echo 'Configuration de KUBECONFIG : ${KUBECONFIG}'"
                 }
             }
         }
@@ -30,7 +29,7 @@ pipeline {
             steps {
                 script {
                     echo "Construction de l'image Docker..."
-                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${DOCKERFILE_PATH.replace('\\', '/')} ${DOCKER_CONTEXT.replace('\\', '/')}"
+                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${DOCKERFILE_PATH} ."
                 }
             }
         }
@@ -47,18 +46,14 @@ pipeline {
             }
         }
 
-      
-          stage('Deploy') {
+        stage('Deploy with kubectl') {
             steps {
                 script {
-                    echo 'Current directory:'
-                    bat 'cd'
+                    // Vérifier l'existence de l'espace de nom, le créer sinon
+                    bat "kubectl get namespace ${KUBERNETES_NAMESPACE} || kubectl create namespace ${KUBERNETES_NAMESPACE}"
                     
-                    echo 'Listing files in directory:'
-                    bat 'dir C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\test\\kubernetes\\'
-                    
-                    echo 'Applying Kubernetes deployment:'
-                    bat 'kubectl apply -f C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\test\\kubernetes\\deployment.yaml -n gestiondocuments'
+                    // Appliquer le fichier YAML de déploiement
+                    bat "kubectl apply -f ${DEPLOYMENT_YAML} -n ${KUBERNETES_NAMESPACE}"
                 }
             }
         }
@@ -69,4 +64,4 @@ pipeline {
             echo "Pipeline terminée"
         }
     }
-}
+} corriger
