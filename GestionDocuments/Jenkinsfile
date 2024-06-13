@@ -64,4 +64,4 @@ pipeline {
             echo "Pipeline terminée"
         }
     }
-} corriger
+} 
