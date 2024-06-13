@@ -1,0 +1,1 @@
+INSERT INTO `utilisateur` (`id_user`, `nom_user`, `prenom_user`, `sex_user`, `cin_user`, `email_user`, `login_user`, `password_user`, `role_user`) VALUES ('0', '[najwa]', '[karrouchi]', '[femme]', '0', '[najwakarrouchi@gmail.com]', '[nnnn]', '[58877615]', '[utilisateur]')

@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    environment {
+        PATH = "C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\nodejs;${env.PATH}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/najwa2222/crda.git'
+            }
+        }
+        stage('Build authentification') {
+            steps {
+                dir('Authentification') {
+                    bat 'docker build -t authentification:latest -f Dockerfile .'
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                bat 'npm install' // Assurez-vous d'installer les dépendances du projet
+            }
+        }
+        stage('Deploy') {
+            steps {
+                bat 'docker-compose up -d'
+            }
+        }
+    }
+}

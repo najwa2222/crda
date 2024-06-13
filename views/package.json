@@ -1,0 +1,12 @@
+{
+  "name": "views",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run build",
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC"
+}
