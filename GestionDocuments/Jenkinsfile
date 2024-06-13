@@ -8,8 +8,7 @@ pipeline {
         DOCKER_TAG = 'latest'
         KUBECONFIG = 'C:\\Users\\acer\\.kube\\config'
         DOCKERFILE_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\app\\backend\\GestionDocuments\\Dockerfile'
-        YAML_FOLDER_PATH = "C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\projet\\kubernetes\\"
-        DEPLOYMENT_YAML = "${YAML_FOLDER_PATH}deployment.yaml"
+        YAML_FOLDER_PATH = "C:\\Users\\acer\\Desktop\\applcrda\\app\\kubernetes\\"
     }
 
     stages {
@@ -47,16 +46,31 @@ pipeline {
         stage('Deploy with kubectl') {
             steps {
                 script {
-                    // Vérifiez l'existence du fichier YAML avant d'appliquer
-                    if (fileExists(DEPLOYMENT_YAML)) {
-                        echo "Fichier de déploiement trouvé : ${DEPLOYMENT_YAML}"
-                        // Vérifiez l'existence de l'espace de nom, le créer sinon
-                        bat "kubectl get namespace ${KUBERNETES_NAMESPACE} || kubectl create namespace ${KUBERNETES_NAMESPACE}"
+                    // Liste des fichiers YAML à déployer
+                    def yamlFiles = [
+                        'deployment-api-gateway.yaml',
+                        'deployment-auth.yaml',
+                        'deployment-controllers.yaml',
+                        'deployment-enregistrement.yaml',
+                        'deployment-gestiondocument.yaml',
+                        'deployment-monitoring.yaml',
+                        'deployment-notification.yaml',
+                        'deployment-recherche.yaml',
+                        'grafana-deployment.yaml',
+                        'mysql-deployment.yaml',
+                        'prometheus-deployment.yaml'
+                    ]
                     
-                        // Appliquer le fichier YAML de déploiement
-                        bat "kubectl apply -f ${DEPLOYMENT_YAML} -n ${KUBERNETES_NAMESPACE}"
-                    } else {
-                        error "Le fichier de déploiement ${DEPLOYMENT_YAML} n'existe pas."
+                    // Parcourir chaque fichier YAML et le déployer
+                    yamlFiles.each { fileName ->
+                        def filePath = "${YAML_FOLDER_PATH}${fileName}"
+                        if (fileExists(filePath)) {
+                            echo "Déploiement du fichier YAML : ${fileName}"
+                            // Appliquer le fichier YAML de déploiement
+                            bat "kubectl apply -f ${filePath} -n ${KUBERNETES_NAMESPACE}"
+                        } else {
+                            error "Le fichier YAML ${fileName} n'existe pas."
+                        }
                     }
                 }
             }
@@ -68,4 +82,9 @@ pipeline {
             echo "Pipeline terminée"
         }
     }
+}
+
+// Fonction pour vérifier si un fichier existe
+def fileExists(filePath) {
+    return file(filePath).exists()
 }
