@@ -12,7 +12,6 @@ pipeline {
         DOCKERFILE_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\app\\backend\\GestionDocuments\\Dockerfile'
         YAML_FOLDER_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\test\\kubernetes\\'
         DEPLOYMENT_YAML = "${YAML_FOLDER_PATH}deployment.yaml"
-        DOCKER_CONTEXT = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\app\\backend\\GestionDocuments'
     }
 
     stages {
@@ -30,7 +29,7 @@ pipeline {
             steps {
                 script {
                     echo "Construction de l'image Docker..."
-                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${DOCKERFILE_PATH.replace('\\', '/')} ${DOCKER_CONTEXT.replace('\\', '/')}"
+                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${DOCKERFILE_PATH.replace('\\', '/')} ."
                 }
             }
         }
@@ -47,24 +46,20 @@ pipeline {
             }
         }
 
-        stage('Check Deployment File') {
-            steps {
-                script {
-                    echo "Vérification de l'existence du fichier de déploiement..."
-                    bat "dir ${YAML_FOLDER_PATH.replace('\\', '/')}"
-                }
-            }
-        }
-
         stage('Deploy with kubectl') {
             steps {
                 script {
-                    echo "Déploiement avec kubectl..."
-                    // Vérifier l'existence de l'espace de nom, le créer sinon
-                    bat "kubectl get namespace ${KUBERNETES_NAMESPACE} || kubectl create namespace ${KUBERNETES_NAMESPACE}"
+                    // Vérifiez l'existence du fichier YAML avant d'appliquer
+                    if (fileExists(DEPLOYMENT_YAML)) {
+                        echo "Fichier de déploiement trouvé : ${DEPLOYMENT_YAML}"
+                        // Vérifiez l'existence de l'espace de nom, le créer sinon
+                        bat "kubectl get namespace ${KUBERNETES_NAMESPACE} || kubectl create namespace ${KUBERNETES_NAMESPACE}"
                     
-                    // Appliquer le fichier YAML de déploiement
-                    bat "kubectl apply -f ${DEPLOYMENT_YAML.replace('\\', '/')} -n ${KUBERNETES_NAMESPACE}"
+                        // Appliquer le fichier YAML de déploiement
+                        bat "kubectl apply -f ${DEPLOYMENT_YAML} -n ${KUBERNETES_NAMESPACE}"
+                    } else {
+                        error "Le fichier de déploiement ${DEPLOYMENT_YAML} n'existe pas."
+                    }
                 }
             }
         }
@@ -75,4 +70,9 @@ pipeline {
             echo "Pipeline terminée"
         }
     }
+}
+
+def fileExists(filePath) {
+    def file = new File(filePath)
+    return file.exists()
 }
