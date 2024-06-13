@@ -10,6 +10,7 @@ pipeline {
         DOCKER_TAG = 'latest'
         KUBECONFIG = 'C:\\Users\\acer\\.kube\\config'
         DOCKERFILE_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\app\\backend\\GestionDocuments\\Dockerfile'
+        DOCKER_CONTEXT = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\app\\backend\\GestionDocuments'
         YAML_FOLDER_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\test\\kubernetes\\'
         DEPLOYMENT_YAML = "${YAML_FOLDER_PATH}deployment.yaml"
     }
@@ -29,7 +30,7 @@ pipeline {
             steps {
                 script {
                     echo "Construction de l'image Docker..."
-                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${DOCKERFILE_PATH.replace('\\', '/')}"
+                    bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${DOCKERFILE_PATH.replace('\\', '/')} ${DOCKER_CONTEXT.replace('\\', '/')}"
                 }
             }
         }
