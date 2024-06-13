@@ -47,16 +47,8 @@ pipeline {
             }
         }
 
-        stage('Check Deployment File') {
-            steps {
-                script {
-                    echo "Vérification de l'existence du fichier de déploiement..."
-                    bat "dir ${YAML_FOLDER_PATH.replace('\\', '/')}"
-                }
-            }
-        }
-
-        stage('Deploy') {
+      
+          stage('Deploy') {
             steps {
                 script {
                     echo 'Current directory:'
