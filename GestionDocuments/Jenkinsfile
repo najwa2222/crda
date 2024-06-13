@@ -2,15 +2,13 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_PATH = 'C:\\Program Files\\Docker\\cli-plugins'
-        PATH = "${DOCKER_PATH};${env.PATH}"
         KUBERNETES_NAMESPACE = 'gestiondocuments'
         KUBERNETES_DEPLOYMENT = 'backend'
         DOCKER_IMAGE = 'najwakarrouchi/gestiondocuments'
         DOCKER_TAG = 'latest'
         KUBECONFIG = 'C:\\Users\\acer\\.kube\\config'
         DOCKERFILE_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\app\\backend\\GestionDocuments\\Dockerfile'
-        YAML_FOLDER_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\test\\kubernetes\\'
+        YAML_FOLDER_PATH = 'C:\\ProgramData\\Jenkins\\workspace\\test\\kubernetes\\'
         DEPLOYMENT_YAML = "${YAML_FOLDER_PATH}deployment.yaml"
     }
 
@@ -19,7 +17,7 @@ pipeline {
             steps {
                 script {
                     echo "Configuration de l'environnement..."
-                    bat "echo Configuration du chemin Docker : ${DOCKER_PATH}"
+                    bat "echo Configuration du chemin Docker : ${DOCKERFILE_PATH}"
                     bat "echo Configuration de KUBECONFIG : ${KUBECONFIG}"
                 }
             }
