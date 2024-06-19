@@ -5,7 +5,7 @@ pipeline {
         DOCKER_PATH = 'C:\\Program Files\\Docker\\cli-plugins'
         PATH = "${DOCKER_PATH};${PATH}"
         KUBECONFIG = 'C:\\Users\\acer\\.kube\\config'
-        DOCKERFILE_PATH = 'C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\app\\backend\\GestionDocuments\\Dockerfile'
+        DOCKERFILE_PATH = 'Dockerfile'
         DOCKER_IMAGE = 'najwakarrouchi/gestiondocuments'
         DOCKER_TAG = 'latest'
     }
@@ -57,7 +57,7 @@ pipeline {
             steps {
                 script {
                     def kubeconfig = env.KUBECONFIG
-                    def yamlFile = "C:/ProgramData/Jenkins/.jenkins/workspace/app/backend/GestionDocuments/deployment-gestiondocument.yaml"
+                    def yamlFile = "deployment-gestiondocument.yaml"
                     
                     bat "kubectl apply -f ${yamlFile} -n gestiondocuments --kubeconfig ${kubeconfig}"
                 }
