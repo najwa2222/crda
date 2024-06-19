@@ -34,7 +34,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'docker-hub-credential', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     bat """
                     docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
-                    docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    docker pull ${DOCKER_IMAGE}:${DOCKER_TAG}
                     """
                 }
             }
