@@ -24,17 +24,17 @@ pipeline {
                 script {
                     echo "Building Docker image..."
                     bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${DOCKERFILE_PATH.replace('\\', '/')} ."
-                    bat "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
                 }
             }
         }
 
         stage('Verify Docker Image') {
             steps {
-                echo "Pushing Docker image..."
-                withCredentials([usernamePassword(credentialsId: 'docker-hub-credential', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                script {
+                    echo "Verifying and pulling Docker image..."
                     bat """
-                    docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%
+                    docker pull ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    docker images ${DOCKER_IMAGE}:${DOCKER_TAG}
                     """
                 }
             }
