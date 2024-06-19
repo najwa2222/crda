@@ -24,6 +24,7 @@ pipeline {
                 script {
                     echo "Building Docker image..."
                     bat "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} -f ${DOCKERFILE_PATH.replace('\\', '/')} ."
+                    bat "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
                 }
             }
         }
